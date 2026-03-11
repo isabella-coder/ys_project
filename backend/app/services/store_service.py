@@ -1170,6 +1170,26 @@ def change_password(db: Session, username: str, current_password: str, new_passw
     return {"message": "密码修改成功"}
 
 
+def list_managed_users(db: Session, actor: dict) -> dict:
+    """列出管理员可管理的用户（仅管理员）"""
+    if normalize_role(actor.get("role")) != "manager":
+        raise StoreApiError("仅店长可查看员工列表", status_code=403)
+
+    users = db.query(StoreUser).filter(StoreUser.is_active == True).all()
+    actor_username = normalize_text(actor.get("username", ""))
+    items = [
+        {
+            "username": normalize_text(u.username),
+            "name": normalize_text(u.name),
+            "role": normalize_role(u.role),
+        }
+        for u in users
+        if normalize_text(u.username) != actor_username
+    ]
+
+    return {"items": items}
+
+
 def reset_password(db: Session, actor: dict, target_username: str, new_password: str) -> dict:
     """重置密码（仅管理员）"""
     if normalize_role(actor.get("role")) != "manager":

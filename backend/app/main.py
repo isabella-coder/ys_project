@@ -80,6 +80,16 @@ app.include_router(auth.router, prefix="/api/v1")
 app.include_router(audit.router, prefix="/api/v1")
 app.include_router(store.router, prefix="/api/v1")
 
+# ============ 静态文件 ============
+
+import os
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
+
+_store_console_dir = Path(__file__).resolve().parent.parent.parent / "admin" / "store-console"
+if _store_console_dir.is_dir():
+    app.mount("/store-console", StaticFiles(directory=str(_store_console_dir), html=True), name="store-console")
+
 
 # ============ 根路由 ============
 

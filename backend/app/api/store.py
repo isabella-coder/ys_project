@@ -23,6 +23,7 @@ from app.services.store_service import (
     list_finance_sync_logs,
     list_followup_due,
     list_followups,
+    list_managed_users,
     list_store_leads,
     list_store_orders,
     logout_store_session,
@@ -512,6 +513,25 @@ async def store_reset_password(
 
     try:
         result = reset_password(db, actor=profile, target_username=target_username, new_password=new_pw)
+    except StoreApiError as error:
+        return _parse_store_error(error)
+
+    return {"ok": True, "success": True, "code": 0, **result}
+
+
+@router.get("/users")
+async def store_list_users(
+    authorization: str = Header(default=""),
+    x_api_token: str = Header(default="", alias="X-Api-Token"),
+    db: Session = Depends(get_db),
+):
+    """列出可管理的员工（仅管理员）"""
+    profile = resolve_store_profile(db, authorization=authorization, x_api_token=x_api_token)
+    if not profile:
+        return _auth_failed_response("请先登录")
+
+    try:
+        result = list_managed_users(db, actor=profile)
     except StoreApiError as error:
         return _parse_store_error(error)
 
