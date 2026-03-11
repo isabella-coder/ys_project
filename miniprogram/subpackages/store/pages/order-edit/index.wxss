@@ -1,4 +1,4 @@
-@import "../film-order/film-order.wxss";
+@import "../film-order/index.wxss";
 
 .empty-card {
   text-align: center;

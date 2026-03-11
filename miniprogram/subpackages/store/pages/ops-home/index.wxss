@@ -1,7 +1,7 @@
 .ops-page {
   min-height: 100vh;
-  padding: 24rpx;
-  background: #f5f7fb;
+  padding: 24rpx 22rpx 40rpx;
+  background: #eceff3;
   box-sizing: border-box;
 }
 
@@ -36,64 +36,102 @@
   border-radius: 999rpx;
 }
 
-.module-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
+.chain-card {
+  margin-top: 18rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
+  border: 2rpx solid #d3d9e3;
+  padding: 24rpx 24rpx 22rpx;
+  box-shadow: 0 3rpx 10rpx rgba(17, 24, 39, 0.05);
 }
 
-.module-card {
-  background: #fff;
-  border-radius: 12rpx;
-  padding: 20rpx;
-  box-shadow: 0 2rpx 8rpx rgba(31, 42, 68, 0.08);
+.chain-film {
+  border-left: 10rpx solid #111827;
 }
 
-.module-head {
+.chain-wash {
+  border-left: 10rpx solid #6b7280;
+}
+
+.chain-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8rpx;
 }
 
-.module-name {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #24324a;
+.chain-title {
+  font-size: 52rpx;
+  font-weight: 700;
+  color: #111827;
 }
 
-.module-tag {
-  font-size: 20rpx;
-  padding: 4rpx 12rpx;
+.chain-tag {
+  font-size: 28rpx;
+  color: #6b7280;
+  padding: 6rpx 18rpx;
   border-radius: 999rpx;
-  background: #eef3ff;
-  color: #2f4f80;
+  border: 2rpx solid #d7dce3;
+  background: #f8fafc;
 }
 
-.module-desc {
-  font-size: 24rpx;
-  color: #6e7a91;
-}
-
-.hint-box {
-  margin-top: 20rpx;
-  background: #fff;
-  border-radius: 12rpx;
-  padding: 20rpx;
-  border-left: 8rpx solid #2f4f80;
-}
-
-.hint-title {
+.chain-subtitle {
   display: block;
+  margin-top: 8rpx;
+  color: #4b5563;
   font-size: 26rpx;
-  font-weight: 600;
-  color: #24324a;
-  margin-bottom: 8rpx;
+  line-height: 1.5;
 }
 
-.hint-text {
+.chain-btn {
+  margin: 20rpx 0 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 64rpx;
+  line-height: 64rpx;
+  border-radius: 999rpx;
+  background: #111827;
+  color: #ffffff;
+  font-size: 32rpx;
+  font-weight: 600;
+  padding: 0 26rpx;
+  border: none;
+}
+
+.quick-box {
+  margin-top: 20rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
+  border: 2rpx solid #e0e5ec;
+  padding: 22rpx 20rpx;
+}
+
+.quick-title {
   display: block;
-  font-size: 24rpx;
-  color: #5f6b83;
-  line-height: 1.7;
+  font-size: 52rpx;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 16rpx;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14rpx;
+}
+
+.quick-item {
+  height: 96rpx;
+  border-radius: 14rpx;
+  border: 2rpx solid #d7dce3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+}
+
+.quick-name {
+  font-size: 40rpx;
+  color: #1f2937;
+  font-weight: 600;
 }

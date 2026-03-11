@@ -99,7 +99,7 @@ Page({
   },
 
   goToCarFilmOps() {
-    wx.navigateTo({ url: '/pages/index/index' })
+    wx.navigateTo({ url: '/subpackages/store/pages/order-list/index' })
   },
 
   resolveRoleAccess() {

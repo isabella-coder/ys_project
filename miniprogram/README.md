@@ -73,7 +73,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ## 5. 快速冒烟
 
-1. 入口链路：`subpackages/store/pages/ops-home/index` -> `pages/index/index`
+1. 入口链路：`subpackages/store/pages/ops-home/index` -> `subpackages/store/pages/order-list/index`
 2. 主流程链路：首页 -> 工单列表 -> 工单详情 -> 编辑/派工 -> 返回
 3. 页面可打开：
 - `pages/douyin-leads/douyin-leads`
