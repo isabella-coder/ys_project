@@ -330,3 +330,23 @@ class StoreOrder(Base):
     updated_at_dt = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
 
     payload = Column(JSON, nullable=False)
+
+
+class FinanceSyncLog(Base):
+    """财务同步日志表（原 admin-console finance-sync-log.json）"""
+    __tablename__ = "finance_sync_log"
+    __table_args__ = (
+        Index("idx_finance_sync_log_order_id", "order_id"),
+        Index("idx_finance_sync_log_created_at", "created_at"),
+    )
+
+    log_id = Column(String(80), primary_key=True, index=True)
+    order_id = Column(String(80), nullable=False, default="")
+    event_type = Column(String(60), nullable=False, default="")
+    service_type = Column(String(60), nullable=False, default="")
+    result = Column(String(20), nullable=False, default="SUCCESS")
+    total_price = Column(Numeric(12, 2), nullable=False, default=0)
+    external_id = Column(String(120), nullable=True)
+    payload = Column(JSON, nullable=False, default=dict)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)

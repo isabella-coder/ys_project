@@ -781,3 +781,520 @@ def build_work_order_sync_response(order: dict, event_type: str = "", source: st
             "receivedAt": now_text(),
         },
     }
+
+
+# ═════════════════════════════════════════════
+# 以下为从 car-film server.py 迁移的 9 个缺失功能
+# ═════════════════════════════════════════════
+
+DAILY_WORK_BAY_LIMIT = 10
+
+FOLLOWUP_RULES = [
+    {"type": "D7", "label": "7天回访", "days": 7},
+    {"type": "D30", "label": "30天回访", "days": 30},
+    {"type": "D60", "label": "60天回访", "days": 60},
+    {"type": "D180", "label": "180天回访", "days": 180},
+]
+
+
+def _get_schedule_snapshot(order: dict) -> dict:
+    dispatch = order.get("dispatchInfo") if isinstance(order.get("dispatchInfo"), dict) else {}
+    tech_names_raw = dispatch.get("technicianNames")
+    if isinstance(tech_names_raw, list) and tech_names_raw:
+        technician_names = [normalize_text(n) for n in tech_names_raw if normalize_text(n)]
+    else:
+        single = normalize_text(dispatch.get("technicianName"))
+        technician_names = [single] if single else []
+
+    date_text = normalize_text(dispatch.get("date") or order.get("appointmentDate"))
+    time_text = normalize_text(dispatch.get("time") or order.get("appointmentTime"))
+    return {
+        "date": date_text,
+        "time": time_text,
+        "workBay": normalize_text(dispatch.get("workBay")),
+        "technicianName": technician_names[0] if technician_names else "",
+        "technicianNames": technician_names,
+    }
+
+
+def _build_dispatch_entries(orders: List[dict], selected_date: str) -> List[dict]:
+    entries = []
+    for order in orders:
+        if normalize_text(order.get("status")) == "已取消":
+            continue
+        snapshot = _get_schedule_snapshot(order)
+        if snapshot["date"] != selected_date:
+            continue
+        entries.append({
+            "id": order.get("id"),
+            "customerName": normalize_text(order.get("customerName")),
+            "phone": normalize_text(order.get("phone")),
+            "carModel": normalize_text(order.get("carModel")),
+            "plateNumber": normalize_text(order.get("plateNumber")),
+            "salesOwner": normalize_text(order.get("salesBrandText")),
+            "store": normalize_text(order.get("store")),
+            "date": snapshot["date"],
+            "time": snapshot["time"],
+            "workBay": snapshot["workBay"],
+            "technicianName": snapshot["technicianName"],
+            "technicianNames": snapshot["technicianNames"],
+            "assigned": bool(snapshot["workBay"] and len(snapshot["technicianNames"]) > 0),
+            "conflicts": [],
+        })
+
+    bay_map: Dict[str, List[int]] = {}
+    tech_map: Dict[str, List[int]] = {}
+    for idx, item in enumerate(entries):
+        if item["time"] and item["workBay"]:
+            bay_key = f"{item['time']}::{item['workBay']}"
+            bay_map.setdefault(bay_key, []).append(idx)
+        if item["time"] and item["technicianNames"]:
+            for name in item["technicianNames"]:
+                tech_key = f"{item['time']}::{name}"
+                tech_map.setdefault(tech_key, []).append(idx)
+
+    for indexes in bay_map.values():
+        if len(indexes) > 1:
+            for idx in indexes:
+                entries[idx]["conflicts"].append("工位冲突")
+    for indexes in tech_map.values():
+        if len(indexes) > 1:
+            for idx in indexes:
+                entries[idx]["conflicts"].append("技师冲突")
+
+    for item in entries:
+        item["conflictText"] = " / ".join(item["conflicts"])
+        item["workBayDisplay"] = item["workBay"] or "未分配工位"
+        item["technicianDisplay"] = " / ".join(item["technicianNames"]) if item["technicianNames"] else "未分配技师"
+
+    entries.sort(key=lambda x: (normalize_text(x.get("time")) or "99:99", normalize_text(x.get("id"))))
+    return entries
+
+
+def _build_dispatch_capacity(entries: List[dict]) -> List[dict]:
+    store_map: Dict[str, dict] = {}
+    for item in entries:
+        store = normalize_text(item.get("store")) or "未填写门店"
+        if store not in store_map:
+            store_map[store] = {"store": store, "total": 0, "assigned": 0}
+        store_map[store]["total"] += 1
+        if normalize_text(item.get("workBay")):
+            store_map[store]["assigned"] += 1
+
+    result = []
+    for data in store_map.values():
+        assigned = data["assigned"]
+        result.append({
+            "store": data["store"],
+            "assigned": assigned,
+            "limit": DAILY_WORK_BAY_LIMIT,
+            "remaining": max(0, DAILY_WORK_BAY_LIMIT - assigned),
+            "full": assigned >= DAILY_WORK_BAY_LIMIT,
+            "total": data["total"],
+        })
+    result.sort(key=lambda x: x["store"])
+    return result
+
+
+def list_dispatch_board(db: Session, user: dict, selected_date: str, view: str = "ALL") -> dict:
+    """派工看板数据"""
+    rows = db.query(StoreOrder).order_by(StoreOrder.updated_at_dt.desc()).all()
+    all_orders = [_record_to_order_payload(row) for row in rows]
+    scoped = _scope_orders(all_orders, user, view)
+
+    entries = _build_dispatch_entries(scoped, selected_date)
+    conflict_count = len([e for e in entries if len(e.get("conflicts", [])) > 0])
+    assigned = len([e for e in entries if e.get("assigned")])
+
+    return {
+        "selectedDate": selected_date,
+        "entries": entries,
+        "capacity": _build_dispatch_capacity(entries),
+        "stats": {
+            "total": len(entries),
+            "assigned": assigned,
+            "unassigned": max(0, len(entries) - assigned),
+            "conflict": conflict_count,
+        },
+    }
+
+
+def _normalize_followup_records_map(records) -> Dict[str, dict]:
+    result = {}
+    if not isinstance(records, list):
+        return result
+    for record in records:
+        if not isinstance(record, dict):
+            continue
+        type_key = normalize_text(record.get("type")).upper()
+        if not type_key:
+            continue
+        result[type_key] = {
+            "done": bool(record.get("done")),
+            "doneAt": normalize_text(record.get("doneAt")),
+            "remark": normalize_text(record.get("remark")),
+        }
+    return result
+
+
+def _pending_followup_status(due_date, today) -> str:
+    if today > due_date:
+        return "OVERDUE"
+    if today == due_date:
+        return "DUE_TODAY"
+    return "PENDING"
+
+
+def _build_followup_items(order: dict, today) -> List[dict]:
+    if normalize_text(order.get("status")) == "已取消":
+        return []
+    if normalize_text(order.get("deliveryStatus")) != "交车通过":
+        return []
+    delivery = parse_datetime_text(order.get("deliveryPassedAt"))
+    if not delivery:
+        return []
+
+    records = _normalize_followup_records_map(order.get("followupRecords"))
+    delivery_date = delivery.date()
+    items = []
+    for rule in FOLLOWUP_RULES:
+        due_date = delivery_date + timedelta(days=rule["days"])
+        record = records.get(rule["type"], {})
+        done = bool(record.get("done"))
+        status = "DONE" if done else _pending_followup_status(due_date, today)
+        items.append({
+            "reminderId": f"{order.get('id')}-{rule['type']}",
+            "orderId": order.get("id"),
+            "type": rule["type"],
+            "label": rule["label"],
+            "days": rule["days"],
+            "dueDateText": due_date.strftime("%Y-%m-%d"),
+            "status": status,
+            "done": done,
+            "doneAt": record.get("doneAt", ""),
+            "remark": record.get("remark", ""),
+            "customerName": normalize_text(order.get("customerName")),
+            "phone": normalize_text(order.get("phone")),
+            "carModel": normalize_text(order.get("carModel")),
+            "plateNumber": normalize_text(order.get("plateNumber")),
+            "salesOwner": normalize_text(order.get("salesBrandText")),
+            "deliveryPassedAt": normalize_text(order.get("deliveryPassedAt")),
+        })
+    return items
+
+
+def _summarize_followups(items: List[dict]) -> dict:
+    return {
+        "total": len(items),
+        "dueToday": len([i for i in items if i.get("status") == "DUE_TODAY"]),
+        "overdue": len([i for i in items if i.get("status") == "OVERDUE"]),
+        "pending": len([i for i in items if i.get("status") == "PENDING"]),
+        "done": len([i for i in items if i.get("status") == "DONE"]),
+    }
+
+
+def list_followups(db: Session, user: dict, status: str = "ALL", view: str = "ALL") -> dict:
+    """回访列表（基于交车通过后的回访规则）"""
+    rows = db.query(StoreOrder).order_by(StoreOrder.updated_at_dt.desc()).all()
+    all_orders = [_record_to_order_payload(row) for row in rows]
+    scoped = _scope_orders(all_orders, user, view)
+
+    today = date.today()
+    items: List[dict] = []
+    for order in scoped:
+        items.extend(_build_followup_items(order, today))
+
+    status_key = normalize_text(status).upper()
+    if status_key and status_key != "ALL":
+        if status_key == "PENDING":
+            items = [i for i in items if i.get("status") in ("PENDING", "DUE_TODAY", "OVERDUE")]
+        else:
+            items = [i for i in items if i.get("status") == status_key]
+
+    priority_map = {"OVERDUE": 0, "DUE_TODAY": 1, "PENDING": 2, "DONE": 3}
+    items.sort(key=lambda x: (
+        priority_map.get(x.get("status"), 9),
+        normalize_text(x.get("dueDateText")),
+        normalize_text(x.get("orderId")),
+        normalize_text(x.get("type")),
+    ))
+
+    return {"items": items, "stats": _summarize_followups(items)}
+
+
+def mark_followup_done(db: Session, user: dict, order_id: str, type_key: str, remark: str = "") -> dict:
+    """标记回访完成"""
+    target_id = normalize_text(order_id)
+    ftype = normalize_text(type_key).upper()
+    if not target_id or not ftype:
+        raise StoreApiError("缺少 orderId 或 type", status_code=400)
+
+    row = db.query(StoreOrder).filter(StoreOrder.order_id == target_id).first()
+    if not row:
+        raise StoreApiError("订单不存在", status_code=404)
+
+    payload = _record_to_order_payload(row)
+    if not can_edit_order(user, payload):
+        raise StoreApiError("无权更新该订单", status_code=403)
+
+    records = payload.get("followupRecords") if isinstance(payload.get("followupRecords"), list) else []
+    next_records = []
+    replaced = False
+    for record in records:
+        if not isinstance(record, dict):
+            continue
+        if normalize_text(record.get("type")).upper() == ftype:
+            next_records.append({"type": ftype, "done": True, "doneAt": now_text(), "remark": normalize_text(remark)})
+            replaced = True
+        else:
+            next_records.append(record)
+
+    if not replaced:
+        next_records.append({"type": ftype, "done": True, "doneAt": now_text(), "remark": normalize_text(remark)})
+
+    payload["followupRecords"] = next_records
+    payload["followupLastUpdatedAt"] = now_text()
+    payload["updatedAt"] = now_text()
+    payload["version"] = int(payload.get("version") or 0) + 1
+
+    _sync_order_columns(row, payload)
+    row.updated_at_dt = datetime.utcnow()
+    db.add(row)
+    db.commit()
+    return {"message": "回访已标记完成"}
+
+
+def list_finance_sync_logs(
+    db: Session, keyword: str = "", event_type: str = "ALL",
+    service_type: str = "ALL", limit: int = 200,
+) -> dict:
+    """财务同步日志列表"""
+    from app.models import FinanceSyncLog
+    query = db.query(FinanceSyncLog).order_by(FinanceSyncLog.created_at.desc())
+    rows = query.limit(min(limit, 1000)).all()
+
+    items = []
+    for row in rows:
+        entry = dict(row.payload) if isinstance(row.payload, dict) else {}
+        entry["id"] = normalize_text(row.log_id)
+        entry["orderId"] = normalize_text(entry.get("orderId") or row.order_id)
+        entry["eventType"] = normalize_text(entry.get("eventType") or row.event_type)
+        entry["serviceType"] = normalize_text(entry.get("serviceType") or row.service_type)
+        entry["result"] = normalize_text(entry.get("result") or row.result).upper() or "SUCCESS"
+        entry["externalId"] = normalize_text(entry.get("externalId") or row.external_id)
+        items.append(entry)
+
+    kw = normalize_keyword(keyword)
+    if kw:
+        items = [i for i in items if kw in normalize_keyword(i.get("orderId"))
+                 or kw in normalize_keyword(i.get("eventType"))]
+
+    et = normalize_text(event_type).upper()
+    if et and et != "ALL":
+        items = [i for i in items if normalize_text(i.get("eventType")).upper() == et]
+
+    st = normalize_text(service_type).upper()
+    if st and st != "ALL":
+        items = [i for i in items if normalize_text(i.get("serviceType")).upper() == st]
+
+    success_count = len([i for i in items if normalize_text(i.get("result")) == "SUCCESS"])
+    failed_count = len([i for i in items if normalize_text(i.get("result")) == "FAILED"])
+    total_amount = 0.0
+    for i in items:
+        try:
+            total_amount += float(i.get("totalPrice") or 0)
+        except (TypeError, ValueError):
+            pass
+
+    return {
+        "items": items,
+        "stats": {
+            "total": len(items),
+            "success": success_count,
+            "failed": failed_count,
+            "totalAmount": round(total_amount, 2),
+        },
+    }
+
+
+def save_finance_sync_log(db: Session, log_data: dict) -> None:
+    """保存一条财务同步日志"""
+    from app.models import FinanceSyncLog
+    log = FinanceSyncLog(
+        log_id=normalize_text(log_data.get("id")) or uuid.uuid4().hex,
+        order_id=normalize_text(log_data.get("orderId")),
+        event_type=normalize_text(log_data.get("eventType")),
+        service_type=normalize_text(log_data.get("serviceType")),
+        result=normalize_text(log_data.get("result")) or "SUCCESS",
+        external_id=normalize_text(log_data.get("externalId")),
+        payload=log_data,
+    )
+    try:
+        log.total_price = float(log_data.get("totalPrice") or 0)
+    except (TypeError, ValueError):
+        log.total_price = 0
+    db.add(log)
+    db.commit()
+
+
+def change_password(db: Session, username: str, current_password: str, new_password: str, keep_session_token: str = "") -> dict:
+    """修改密码（保留当前 session）"""
+    target_username = normalize_text(username)
+    current_pw = normalize_text(current_password)
+    new_pw = normalize_text(new_password)
+
+    if not current_pw or not new_pw:
+        raise StoreApiError("请填写当前密码和新密码", status_code=400)
+    if len(new_pw) < 4:
+        raise StoreApiError("新密码至少 4 位", status_code=400)
+
+    user = db.query(StoreUser).filter(StoreUser.username == target_username, StoreUser.is_active == True).first()
+    if not user:
+        raise StoreApiError("账号不存在", status_code=404)
+    if not verify_password(current_pw, user.password_hash):
+        raise StoreApiError("当前密码错误", status_code=400)
+    if verify_password(new_pw, user.password_hash):
+        raise StoreApiError("新密码不能与当前密码相同", status_code=400)
+
+    user.password_hash = hash_password(new_pw)
+    user.updated_at = datetime.utcnow()
+    db.commit()
+
+    # 清除该用户的其他会话（保留当前 token）
+    query = db.query(StoreAuthSession).filter(StoreAuthSession.username == target_username)
+    if keep_session_token:
+        query = query.filter(StoreAuthSession.session_token != keep_session_token)
+    query.delete(synchronize_session=False)
+    db.commit()
+
+    return {"message": "密码修改成功"}
+
+
+def reset_password(db: Session, actor: dict, target_username: str, new_password: str) -> dict:
+    """重置密码（仅管理员）"""
+    if normalize_role(actor.get("role")) != "manager":
+        raise StoreApiError("仅店长可重置密码", status_code=403)
+
+    target = normalize_text(target_username)
+    new_pw = normalize_text(new_password)
+    if not target or not new_pw:
+        raise StoreApiError("请填写账号和新密码", status_code=400)
+    if len(new_pw) < 4:
+        raise StoreApiError("新密码至少 4 位", status_code=400)
+
+    user = db.query(StoreUser).filter(StoreUser.username == target).first()
+    if not user:
+        raise StoreApiError("账号不存在", status_code=404)
+
+    user.password_hash = hash_password(new_pw)
+    user.updated_at = datetime.utcnow()
+    db.commit()
+
+    db.query(StoreAuthSession).filter(StoreAuthSession.username == target).delete(synchronize_session=False)
+    db.commit()
+
+    return {"message": f"{target} 密码已重置"}
+
+
+def import_orders(db: Session, actor: dict, orders: list) -> dict:
+    """批量导入订单（仅管理员）"""
+    if normalize_role(actor.get("role")) != "manager":
+        raise StoreApiError("仅店长可导入订单", status_code=403)
+    if not isinstance(orders, list):
+        raise StoreApiError("orders 必须是数组", status_code=400)
+
+    result = apply_incremental_order_sync(db, orders)
+    return {
+        "message": f"已导入 {result.get('acceptedCount', 0)} 条订单",
+        "acceptedCount": result.get("acceptedCount", 0),
+        "conflictCount": result.get("conflictCount", 0),
+    }
+
+
+def _build_lead_remark(lead: dict) -> str:
+    parts = []
+    grade = normalize_text(lead.get("grade"))
+    if grade:
+        parts.append(f"【{grade}级线索】")
+    score = lead.get("gradeScore")
+    if score:
+        parts.append(f"评分{score}分")
+    reasons = lead.get("gradeReasons", [])
+    if reasons:
+        parts.append(" / ".join(reasons[:3]))
+    budget = normalize_text(lead.get("budgetRange"))
+    if budget:
+        parts.append(f"预算: {budget}")
+    summary = normalize_text(lead.get("conversationSummary"))
+    if summary:
+        parts.append(f"\n--- AI对话摘要 ---\n{summary[:200]}")
+    return "\n".join(parts) if parts else ""
+
+
+def _build_followup_records_from_days(suggested_days) -> list:
+    if not isinstance(suggested_days, list):
+        return []
+    day_to_type = {1: "D1", 3: "D3", 7: "D7", 30: "D30", 60: "D60", 180: "D180"}
+    records = []
+    for d in suggested_days:
+        ftype = day_to_type.get(d, f"D{d}")
+        records.append({"type": ftype, "done": False, "doneAt": "", "remark": ""})
+    return records
+
+
+def push_lead(db: Session, lead: dict) -> dict:
+    """抖音 AI 线索推送（养龙虾 → 蔚蓝）"""
+    if not isinstance(lead, dict) or not (lead.get("customerName") or lead.get("carModel")):
+        raise StoreApiError("线索数据不完整", status_code=400)
+
+    lead_id = normalize_text(lead.get("id")) or f"DY{datetime.now().strftime('%Y%m%d%H%M%S')}{uuid.uuid4().hex[:4]}"
+    grade = normalize_text(lead.get("grade")) or "C"
+    store = normalize_text(lead.get("storeCode")) or "BOP保镖上海工厂店"
+    if "BOP" in store.upper():
+        store = "BOP保镖上海工厂店"
+    elif "LM" in store.upper() or "龙膜" in store:
+        store = "龙膜精英店"
+
+    order_obj = {
+        "id": lead_id, "serviceType": "FILM", "status": "未完工", "version": 0,
+        "customerName": normalize_text(lead.get("customerName")),
+        "phone": normalize_text(lead.get("phone")),
+        "carModel": normalize_text(lead.get("carModel")),
+        "plateNumber": "", "sourceChannel": "抖音私信", "store": store,
+        "salesBrandText": normalize_text(lead.get("assignedSales")),
+        "packageLabel": normalize_text(lead.get("serviceType")),
+        "remark": _build_lead_remark(lead),
+        "priceSummary": {"packagePrice": 0, "addOnFee": 0, "totalPrice": 0, "deposit": 0},
+        "createdAt": lead.get("createdAt") or now_text(), "updatedAt": now_text(),
+        "leadSource": "douyin_ai", "leadStatus": "待联系",
+        "leadGrade": grade, "leadGradeScore": lead.get("gradeScore", 0),
+        "leadGradeReasons": lead.get("gradeReasons", []),
+        "leadBudgetRange": normalize_text(lead.get("budgetRange")),
+        "leadConversationSummary": normalize_text(lead.get("conversationSummary")),
+        "leadFollowupPriority": normalize_text(lead.get("followupPriority")),
+        "leadSuggestedFollowupDays": lead.get("suggestedFollowupDays", []),
+        "leadWechat": normalize_text(lead.get("wechat")),
+        "leadPlatform": normalize_text(lead.get("platform")),
+        "leadAccountCode": normalize_text(lead.get("accountCode")),
+        "followupRecords": _build_followup_records_from_days(lead.get("suggestedFollowupDays", [])),
+        "followupLastUpdatedAt": now_text(),
+    }
+
+    apply_incremental_order_sync(db, [order_obj])
+    return {
+        "orderId": lead_id, "grade": grade,
+        "assignedSales": order_obj.get("salesBrandText", ""),
+        "receivedAt": now_text(),
+    }
+
+
+def check_db_health(db: Session) -> dict:
+    """数据库健康检查"""
+    try:
+        from sqlalchemy import text
+        db.execute(text("SELECT 1")).fetchone()
+        order_count = db.query(StoreOrder).count()
+        user_count = db.query(StoreUser).count()
+        return {"status": "ok", "database": "connected", "orders": order_count, "users": user_count}
+    except Exception as e:
+        return {"status": "error", "database": "disconnected", "error": str(e)}

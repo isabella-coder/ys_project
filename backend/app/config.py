@@ -102,10 +102,6 @@ class Settings(BaseSettings):
         except (json.JSONDecodeError, TypeError):
             return {}
 
-    # 蔚蓝工单系统对接
-    WEILAN_API_URL: str = os.getenv("WEILAN_API_URL", "http://localhost:8080")
-    WEILAN_API_TOKEN: str = os.getenv("WEILAN_API_TOKEN", "")
-
     # 日志配置
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
     LOG_FORMAT: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
