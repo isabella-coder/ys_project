@@ -1,6 +1,6 @@
 <template>
   <div class="stats-page">
-    <h2>📊 日报统计</h2>
+    <h2>日报统计</h2>
     
     <div class="filters">
       <el-date-picker 
@@ -127,7 +127,7 @@ const loadStats = async () => {
 
 <style scoped>
 .stats-page {
-  padding: 20px;
+  padding: 4px;
 }
 
 .filters {
@@ -143,37 +143,43 @@ const loadStats = async () => {
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 15px;
-  margin-bottom: 30px;
+  gap: 14px;
+  margin-bottom: 28px;
 }
 
 .stat-card {
-  background: white;
-  padding: 20px;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  padding: 18px;
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
   text-align: center;
 }
 
 .stat-card .label {
   font-size: 12px;
-  color: #666;
-  margin-bottom: 10px;
+  color: #9ca3af;
+  margin-bottom: 8px;
+  font-weight: 500;
 }
 
 .stat-card .value {
-  font-size: 28px;
-  font-weight: bold;
-  color: #409eff;
+  font-size: 26px;
+  font-weight: 600;
+  color: #1a1d21;
 }
 
 .charts-container {
-  background: white;
+  background: #ffffff;
   padding: 20px;
-  border-radius: 4px;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
 }
 
 .chart-box h3 {
-  margin-bottom: 15px;
+  margin-bottom: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1d21;
 }
 </style>

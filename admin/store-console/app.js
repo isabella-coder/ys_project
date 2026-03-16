@@ -25,6 +25,9 @@ const state = {
     serviceType: "ALL",
     keyword: "",
     limit: "200",
+    dateFrom: "",
+    dateTo: "",
+    cachedItems: [],
   },
   security: {
     users: [],
@@ -76,6 +79,12 @@ const el = {
   financeRefreshBtn: document.getElementById("financeRefreshBtn"),
   financeStats: document.getElementById("financeStats"),
   financeTbody: document.getElementById("financeTbody"),
+  financeDateFrom: document.getElementById("financeDateFrom"),
+  financeDateTo: document.getElementById("financeDateTo"),
+  financeExportBtn: document.getElementById("financeExportBtn"),
+  orderDetailModal: document.getElementById("orderDetailModal"),
+  orderDetailBody: document.getElementById("orderDetailBody"),
+  modalCloseBtn: document.getElementById("modalCloseBtn"),
   changePasswordForm: document.getElementById("changePasswordForm"),
   currentPasswordInput: document.getElementById("currentPasswordInput"),
   newPasswordInput: document.getElementById("newPasswordInput"),
@@ -170,6 +179,21 @@ function bindEvents() {
   });
   el.financeRefreshBtn.addEventListener("click", loadFinanceLogs);
 
+  el.financeDateFrom.addEventListener("change", () => {
+    state.finance.dateFrom = el.financeDateFrom.value;
+    loadFinanceLogs();
+  });
+  el.financeDateTo.addEventListener("change", () => {
+    state.finance.dateTo = el.financeDateTo.value;
+    loadFinanceLogs();
+  });
+  el.financeExportBtn.addEventListener("click", exportFinanceCsv);
+
+  el.modalCloseBtn.addEventListener("click", closeOrderDetailModal);
+  el.orderDetailModal.addEventListener("click", (e) => {
+    if (e.target === el.orderDetailModal) closeOrderDetailModal();
+  });
+
   el.changePasswordForm.addEventListener("submit", onChangePasswordSubmit);
   el.resetPasswordForm.addEventListener("submit", onResetPasswordSubmit);
 }
@@ -229,6 +253,8 @@ function setupAfterLogin() {
   el.financeServiceTypeSelect.value = state.finance.serviceType;
   el.financeLimitSelect.value = state.finance.limit;
   el.financeKeywordInput.value = state.finance.keyword;
+  el.financeDateFrom.value = state.finance.dateFrom;
+  el.financeDateTo.value = state.finance.dateTo;
 
   const roleText = getRoleText(state.user.role);
   el.userBadge.textContent = `${state.user.name} · ${roleText}`;
@@ -338,13 +364,21 @@ async function loadFinanceLogs() {
     if (state.finance.keyword) {
       params.set("keyword", state.finance.keyword);
     }
+    if (state.finance.dateFrom) {
+      params.set("dateFrom", state.finance.dateFrom);
+    }
+    if (state.finance.dateTo) {
+      params.set("dateTo", state.finance.dateTo);
+    }
 
     const result = await request(`${API_BASE}/finance/sync-logs?${params.toString()}`);
+    state.finance.cachedItems = result.items || [];
     renderFinanceStats(result.stats || {});
-    renderFinanceRows(result.items || []);
+    renderFinanceRows(state.finance.cachedItems);
   } catch (error) {
+    state.finance.cachedItems = [];
     renderCards(el.financeStats, []);
-    renderErrorRow(el.financeTbody, error.message, 9);
+    renderErrorRow(el.financeTbody, error.message, 10);
   }
 }
 
@@ -566,10 +600,12 @@ function renderFinanceStats(stats) {
 function renderFinanceRows(items) {
   const rows = items.map((item) => {
     const amount = Number.isFinite(Number(item.totalPrice)) ? Number(item.totalPrice) : 0;
+    const isFailed = String(item.result || "").toUpperCase() === "FAILED";
+    const orderId = escapeHtml(item.orderId || "");
     return `
       <tr>
         <td>${escapeHtml(item.receivedAt || "")}</td>
-        <td>${escapeHtml(item.orderId || "")}</td>
+        <td><a href="javascript:void(0)" class="link-order" data-order-id="${orderId}">${orderId}</a></td>
         <td>${escapeHtml(item.eventType || "")}</td>
         <td>${escapeHtml(item.source || "")}</td>
         <td>${escapeHtml(item.serviceType || "")}</td>
@@ -577,11 +613,24 @@ function renderFinanceRows(items) {
         <td>¥${amount.toFixed(2)}</td>
         <td>${escapeHtml(item.externalId || "-")}</td>
         <td>${buildFinanceResultTag(item.result)}</td>
+        <td>${isFailed ? `<button class="action-btn retry-btn" data-log-id="${escapeHtml(item.id || "")}" data-order-id="${orderId}">重试</button>` : ""}</td>
       </tr>
     `;
   }).join("");
 
-  el.financeTbody.innerHTML = rows || `<tr><td colspan="9">暂无财务日志</td></tr>`;
+  el.financeTbody.innerHTML = rows || `<tr><td colspan="10">暂无财务日志</td></tr>`;
+
+  Array.from(el.financeTbody.querySelectorAll(".link-order")).forEach((link) => {
+    link.addEventListener("click", () => {
+      showOrderDetail(link.dataset.orderId);
+    });
+  });
+
+  Array.from(el.financeTbody.querySelectorAll(".retry-btn")).forEach((btn) => {
+    btn.addEventListener("click", () => {
+      retryFinanceSync(btn.dataset.orderId, btn);
+    });
+  });
 }
 
 function renderResetUserOptions(items) {
@@ -795,6 +844,145 @@ function getTodayDate() {
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const day = String(now.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+}
+
+function exportFinanceCsv() {
+  const items = state.finance.cachedItems;
+  if (!items || items.length === 0) {
+    alert("暂无数据可导出");
+    return;
+  }
+
+  const headers = ["接收时间", "订单号", "事件", "来源", "业务类型", "订单状态", "金额", "财务单号", "结果"];
+  const rows = items.map((item) => {
+    const amount = Number.isFinite(Number(item.totalPrice)) ? Number(item.totalPrice).toFixed(2) : "0.00";
+    return [
+      item.receivedAt || "",
+      item.orderId || "",
+      item.eventType || "",
+      item.source || "",
+      item.serviceType || "",
+      item.orderStatus || "",
+      amount,
+      item.externalId || "",
+      item.result || "",
+    ].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",");
+  });
+
+  const bom = "\uFEFF";
+  const csv = bom + headers.join(",") + "\n" + rows.join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  const dateStr = getTodayDate();
+  a.download = `财务日志_${dateStr}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+async function showOrderDetail(orderId) {
+  if (!orderId) return;
+
+  el.orderDetailBody.innerHTML = "<p>加载中...</p>";
+  el.orderDetailModal.classList.remove("hidden");
+
+  try {
+    const params = new URLSearchParams();
+    params.set("view", "ALL");
+    params.set("keyword", orderId);
+    const result = await request(`${API_BASE}/orders?${params.toString()}`);
+    const items = result.items || [];
+    const order = items.find((o) => o.id === orderId) || items[0];
+    if (!order) {
+      el.orderDetailBody.innerHTML = `<p>未找到订单 ${escapeHtml(orderId)}</p>`;
+      return;
+    }
+    renderOrderDetailModal(order);
+  } catch (error) {
+    el.orderDetailBody.innerHTML = `<p>加载失败：${escapeHtml(error.message)}</p>`;
+  }
+}
+
+function renderOrderDetailModal(order) {
+  const total = order.priceSummary && Number.isFinite(Number(order.priceSummary.totalPrice))
+    ? `¥${Number(order.priceSummary.totalPrice).toFixed(2)}`
+    : "¥0.00";
+  const deposit = order.priceSummary && Number.isFinite(Number(order.priceSummary.depositAmount))
+    ? `¥${Number(order.priceSummary.depositAmount).toFixed(2)}`
+    : "¥0.00";
+
+  const fields = [
+    { label: "订单号", value: order.id },
+    { label: "状态", value: order.status },
+    { label: "客户", value: order.customerName || "未填写" },
+    { label: "手机", value: order.customerPhone || "未填写" },
+    { label: "车型", value: order.carModel || "未填写" },
+    { label: "车牌", value: order.plateNumber || "未填" },
+    { label: "销售", value: order.salesBrandText || "未填写" },
+    { label: "门店", value: order.store || "未填写" },
+    { label: "预约日期", value: `${order.appointmentDate || ""} ${order.appointmentTime || ""}` },
+    { label: "总金额", value: total },
+    { label: "定金", value: deposit },
+    { label: "交车状态", value: order.deliveryStatus || "待交车验收" },
+    { label: "业务类型", value: order.serviceType || "未填" },
+  ];
+
+  const html = `
+    <table class="detail-table">
+      ${fields.map((f) => `
+        <tr>
+          <td class="detail-label">${escapeHtml(f.label)}</td>
+          <td class="detail-value">${escapeHtml(String(f.value || ""))}</td>
+        </tr>
+      `).join("")}
+    </table>
+  `;
+  el.orderDetailBody.innerHTML = html;
+}
+
+function closeOrderDetailModal() {
+  el.orderDetailModal.classList.add("hidden");
+  el.orderDetailBody.innerHTML = "";
+}
+
+async function retryFinanceSync(orderId, btnEl) {
+  if (!orderId) return;
+  if (!window.confirm(`确定要重新同步订单 ${orderId} 吗？`)) return;
+
+  btnEl.disabled = true;
+  btnEl.textContent = "同步中...";
+
+  try {
+    const params = new URLSearchParams();
+    params.set("view", "ALL");
+    params.set("keyword", orderId);
+    const result = await request(`${API_BASE}/orders?${params.toString()}`);
+    const items = result.items || [];
+    const order = items.find((o) => o.id === orderId) || items[0];
+    if (!order) {
+      alert(`未找到订单 ${orderId}`);
+      return;
+    }
+
+    await request(`${API_BASE}/internal/work-orders/sync`, {
+      method: "POST",
+      body: {
+        eventType: "MANUAL_RETRY",
+        source: "admin-console",
+        order: order,
+      },
+    });
+
+    alert("重新同步成功");
+    loadFinanceLogs();
+  } catch (error) {
+    alert("同步失败：" + (error.message || "未知错误"));
+    btnEl.disabled = false;
+    btnEl.textContent = "重试";
+  }
 }
 
 function escapeHtml(value) {

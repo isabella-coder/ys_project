@@ -54,7 +54,7 @@ onMounted(loadData)
 
 <style scoped>
 .page {
-  padding: 20px;
+  padding: 4px;
 }
 
 .filters {

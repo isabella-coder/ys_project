@@ -10,6 +10,7 @@ const { syncOrderToFinance } = require('../../../../utils/finance-sync');
 const { ensureMiniSessionOrNavigate } = require('../../../../utils/page-access');
 const { canCreateOrderContext, canEditOrderContext, getCurrentUserContext } = require('../../../../utils/user-context');
 const { TECHNICIAN_OPTIONS } = require('../../../../utils/staff-options');
+const { calculateFixedTechnicianCommission } = require('../../../../utils/commission-rules');
 
 const DAILY_WORK_BAY_LIMIT = 10;
 const WORK_BAY_OPTIONS = Array.from({ length: DAILY_WORK_BAY_LIMIT }, (_, index) => `${index + 1}号工位`);
@@ -221,9 +222,11 @@ Page({
 
   updateSummary(totalPriceText) {
     const totalPrice = normalizeMoneyValue(totalPriceText);
-    const commissionTotal = totalPrice > 0
-      ? Math.round(totalPrice * 0.08 * 100) / 100
-      : 0;
+    const fixedCommission = calculateFixedTechnicianCommission({
+      serviceType: 'WASH',
+      totalPrice
+    });
+    const commissionTotal = fixedCommission ? fixedCommission.commissionTotal : 0;
 
     this.setData({
       summary: {
@@ -648,9 +651,11 @@ function normalizeMoneyValue(value) {
 
 function buildSummary(totalPriceText) {
   const totalPrice = normalizeMoneyValue(totalPriceText);
-  const commissionTotal = totalPrice > 0
-    ? Math.round(totalPrice * 0.08 * 100) / 100
-    : 0;
+  const fixedCommission = calculateFixedTechnicianCommission({
+    serviceType: 'WASH',
+    totalPrice
+  });
+  const commissionTotal = fixedCommission ? fixedCommission.commissionTotal : 0;
   return {
     totalPrice,
     commissionTotal

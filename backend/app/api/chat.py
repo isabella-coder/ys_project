@@ -12,11 +12,12 @@ from pydantic import BaseModel
 from typing import Optional
 
 from app.config import settings
-from app.services.chat_engine import handle_message
+from app.services.chat_engine import handle_message, handle_welcome
 from app.integrations.douyin import (
     verify_signature,
     parse_im_event,
     send_private_message,
+    exchange_code_for_token,
 )
 from app.db import get_db_context
 from app.models import Account
@@ -39,6 +40,27 @@ async def douyin_webhook_verify(
     return {"challenge": challenge}
 
 
+@router.get("/douyin/callback")
+async def douyin_oauth_callback(
+    code: str = Query(None, description="抖音授权码"),
+):
+    """
+    抖音 OAuth 授权回调。
+    抖音企业号授权后会重定向到这个地址，带上 authorization_code。
+    用授权码换取用户 access_token，后续即可发送私信。
+    """
+    if not code:
+        return {"success": False, "message": "缺少授权码"}
+
+    result = await exchange_code_for_token(code)
+    if result.get("success"):
+        logger.info(f"抖音授权成功，open_id={result.get('open_id')}")
+        return {"success": True, "message": "授权成功！现在可以自动回复私信了。"}
+    else:
+        logger.error(f"抖音授权失败: {result.get('error')}")
+        return {"success": False, "message": f"授权失败: {result.get('error')}"}
+
+
 @router.post("/douyin/webhook")
 async def douyin_webhook_receive(request: Request):
     """
@@ -46,6 +68,12 @@ async def douyin_webhook_receive(request: Request):
     """
     body_bytes = await request.body()
     body = await request.json()
+
+    # 抖音 Webhook URL 验证：返回 challenge 值
+    if body.get("event") == "verify_webhook":
+        challenge = body.get("content", {}).get("challenge")
+        if challenge is not None:
+            return {"challenge": challenge}
 
     # 签名验证（生产环境必须开启）
     if settings.DOUYIN_WEBHOOK_TOKEN:
@@ -58,8 +86,32 @@ async def douyin_webhook_receive(request: Request):
 
     # 解析私信消息
     msg = parse_im_event(body)
-    if not msg or not msg["content"]:
-        # 非文本消息或其他事件类型，直接 200 避免重试
+    if not msg:
+        return {"err_no": 0, "err_tips": "ok"}
+
+    # 进入会话事件 → 发送AI欢迎语
+    if msg.get("msg_type") == "enter":
+        open_id = msg["open_id"]
+        account_code = _resolve_account_code(body)
+        store_code = _resolve_store_code(account_code)
+        logger.info(f"客户进入私信窗口: open_id={open_id}, account={account_code}")
+        welcome = await handle_welcome(
+            platform="douyin",
+            account_code=account_code,
+            open_id=open_id,
+            store_code=store_code,
+        )
+        if welcome:
+            await send_private_message(open_id, welcome)
+        return {"err_no": 0, "err_tips": "ok"}
+
+    # 非文本消息（图片/视频/卡片等）→ 自动引导客户打字
+    if msg.get("msg_type") != "text" or not msg["content"]:
+        if msg.get("open_id") and msg.get("msg_type") in ("image", "img", "video", "card", "share"):
+            await send_private_message(
+                msg["open_id"],
+                "哥，图片/视频我这边看不了，方便直接打字发一下吗？比如微信号或者想咨询的问题～"
+            )
         return {"err_no": 0, "err_tips": "ok"}
 
     open_id = msg["open_id"]

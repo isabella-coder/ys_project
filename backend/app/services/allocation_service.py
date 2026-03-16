@@ -5,6 +5,7 @@
 from datetime import datetime
 from sqlalchemy.orm import Session
 from app.models import Lead, SalesAllocation, Sales
+from app.services.lead_notifier import notify_lead_assigned
 import uuid
 
 
@@ -58,5 +59,11 @@ def assign_lead_to_sales(db: Session, lead: Lead) -> Lead:
     lead.status = "assigned"
     
     db.commit()
+
+    # 推送订阅消息通知销售
+    try:
+        notify_lead_assigned(lead, next_sales)
+    except Exception:
+        pass  # 通知失败不影响分配
     
     return lead

@@ -59,16 +59,23 @@
     </view>
 
     <view wx:if="{{loading}}" class="loading-box">
-      <text>加载中...</text>
+      <!-- 骨架屏 -->
+      <view class="skeleton-lead" wx:for="{{[1,2,3]}}" wx:key="index">
+        <view class="skeleton skeleton-line skeleton-line-medium"></view>
+        <view class="skeleton skeleton-line skeleton-line-short"></view>
+        <view class="skeleton skeleton-line skeleton-line-full" style="height:20rpx"></view>
+      </view>
     </view>
 
     <view wx:elif="{{recentLeads.length === 0}}" class="empty-box">
-      <text class="empty-icon">✅</text>
+      <view class="empty-icon-wrap">
+        <view class="empty-check"></view>
+      </view>
       <text class="empty-text">当前无待处理线索</text>
     </view>
 
     <view wx:else class="lead-list">
-      <view class="lead-item" wx:for="{{recentLeads}}" wx:key="lead_id"
+      <view class="lead-item status-{{item.status}}" wx:for="{{recentLeads}}" wx:key="lead_id"
         bindtap="goToLeadDetail" data-id="{{item.lead_id}}">
         <view class="lead-top">
           <text class="lead-name">{{item.customer_nickname || '未知客户'}}</text>

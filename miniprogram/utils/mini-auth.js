@@ -26,6 +26,8 @@ function loginMiniProgram(options) {
 
   setFinanceBaseUrl(baseUrl);
 
+  console.log('[loginMiniProgram] url=', baseUrl + '/api/v1/store/login', 'username=', username);
+
   return requestAuthJson({
     baseUrl,
     path: '/api/v1/store/login',

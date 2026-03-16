@@ -1,57 +1,242 @@
-/**wxss**/
+/**
+ * Design System: Modern Minimal
+ * Color palette: Neutral slate + soft blue accents
+ * Typography: System fonts, generous spacing, clear hierarchy
+ */
 
 page {
-  background-color: #f5f5f5;
-  color: #333;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f8f9fb;
+  color: #1a1d21;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  font-size: 28rpx;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
 
-view {
+view,
+text,
+button,
+input,
+textarea,
+picker,
+scroll-view {
   box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'SF Pro Text', 'Helvetica Neue', sans-serif;
 }
 
 .container {
-  padding: 20rpx;
+  padding: 24rpx;
 }
 
-.header {
-  background-color: #fff;
-  padding: 20rpx;
-  margin-bottom: 20rpx;
-  border-radius: 8rpx;
-  box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.1);
+/* ─── Card System ─── */
+.header,
+.content,
+.card,
+.section,
+.state-box,
+.lead-card,
+.stat-card,
+.summary-card,
+.order-card,
+.search-box,
+.overview-box,
+.quick-box,
+.chain-card,
+.login-card {
+  background-color: #ffffff;
+  border: none;
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 
 .header-title {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #1a1d21;
+  letter-spacing: 0.5rpx;
 }
 
-.content {
-  background-color: #fff;
-  padding: 20rpx;
+/* ─── Buttons ─── */
+button {
+  border-radius: 16rpx;
+  border: none;
+  font-size: 28rpx;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+button::after {
+  border: none;
+}
+
+.button,
+.button-primary,
+.btn-primary,
+.action-reply,
+.chain-btn,
+.batch-submit-btn,
+.batch-result-retry {
+  background-color: #1a1d21;
+  color: #ffffff;
+  border: none;
+}
+
+.button-secondary,
+.batch-result-close,
+.batch-toggle-btn {
+  background-color: #f0f1f3;
+  color: #3d4148;
+  border: none;
+}
+
+/* ─── Section Titles ─── */
+.section-title {
+  position: relative;
+  padding-left: 20rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1a1d21;
+  letter-spacing: 0.5rpx;
+}
+
+/* ─── Skeleton Screen ─── */
+@keyframes skeleton-pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 0.3; }
+  100% { opacity: 0.6; }
+}
+
+.skeleton {
+  background: #e8eaed;
   border-radius: 8rpx;
-  box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.1);
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
 }
 
-.button {
-  background-color: #409eff;
-  color: white;
-  padding: 12rpx 24rpx;
-  border-radius: 4rpx;
-  margin: 10rpx;
-  display: inline-block;
-  text-align: center;
+.skeleton-line {
+  height: 28rpx;
+  margin-bottom: 16rpx;
+  border-radius: 6rpx;
 }
 
-.button:active {
-  background-color: #3c8ce7;
+.skeleton-line-short {
+  width: 40%;
 }
 
+.skeleton-line-medium {
+  width: 65%;
+}
+
+.skeleton-line-full {
+  width: 100%;
+}
+
+.skeleton-circle {
+  border-radius: 50%;
+}
+
+.skeleton-card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6rpx;
+  width: 6rpx;
+  height: 32rpx;
+  border-radius: 6rpx;
+  background: #3b82f6;
+}
+
+/* ─── Text ─── */
+.label,
+.hint,
+.line,
+.info-item,
+.time-text,
+.summary-text,
+.report-metrics,
+.period-line,
+.order-line {
+  line-height: 1.6;
+}
+
+/* ─── Form Inputs ─── */
+.input,
+.picker,
+.textarea,
+.search-input,
+.date-box,
+.sales-picker {
+  font-size: 28rpx;
+  border: 2rpx solid #e8eaed;
+  border-radius: 14rpx;
+  background: #fafbfc;
+  transition: border-color 0.2s;
+}
+
+/* ─── Button Sizing ─── */
+.button-primary,
+.button-secondary,
+.login-btn,
+.search-btn,
+.batch-submit-btn,
+.batch-toggle-btn,
+.batch-result-close,
+.batch-result-retry,
+.date-apply-btn,
+.export-btn,
+.chain-btn {
+  min-height: 88rpx;
+  line-height: 88rpx;
+}
+
+.mini-btn,
+.upload-btn,
+.delete-btn,
+.reset-btn,
+.quick-btn,
+.quick-export-btn,
+.record-remove-btn,
+.page-btn {
+  min-height: 64rpx;
+  line-height: 64rpx;
+  border-radius: 12rpx;
+}
+
+/* ─── Status Badges ─── */
+.status-badge {
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  letter-spacing: 0.5rpx;
+}
+
+.status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-warning {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+/* ─── List Items ─── */
 .list-item {
-  padding: 16rpx;
-  border-bottom: 1rpx solid #eee;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f1f3;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -59,26 +244,4 @@ view {
 
 .list-item:last-child {
   border-bottom: none;
-}
-
-.status-badge {
-  padding: 4rpx 12rpx;
-  border-radius: 20rpx;
-  font-size: 12rpx;
-  font-weight: bold;
-}
-
-.status-pending {
-  background-color: #fde6e8;
-  color: #f56c6c;
-}
-
-.status-success {
-  background-color: #e8f5e9;
-  color: #67c23a;
-}
-
-.status-warning {
-  background-color: #fdf1e6;
-  color: #e6a23c;
 }

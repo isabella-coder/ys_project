@@ -8,14 +8,14 @@
   ],
   "window": {
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#fff",
+    "navigationBarBackgroundColor": "#f8f9fb",
     "navigationBarTitleText": "两店客资中台",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
-    "color": "#999",
-    "selectedColor": "#409eff",
-    "backgroundColor": "#fff",
+    "color": "#9ca3af",
+    "selectedColor": "#1a1d21",
+    "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [
       {

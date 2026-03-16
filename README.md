@@ -31,12 +31,13 @@
 
 ```
 .
-├── docs/                        # 项目文档
+├── docs/                        # 项目文档与规范
 │   ├── 01-架构设计.md
-│   ├── 02-数据库设计.md
-│   ├── 03-API接口定义.md
-│   ├── 04-业务规则.md
-│   └── 05-部署指南.md
+│   ├── ARCHITECTURE.md
+│   ├── DATABASE_SCHEMA.md
+│   ├── API_SPEC.md
+│   ├── PHASE1_REQUIREMENTS.md
+│   └── specs/
 │
 ├── backend/                     # Python FastAPI 统一后端
 │   ├── app/
@@ -55,18 +56,23 @@
 │   │   ├── db/                 # 数据库初始化
 │   │   ├── utils/              # 工具函数
 │   │   └── integrations/       # 外部集成
+│   ├── migrations/             # Alembic 迁移目录
+│   ├── tests/                  # Pytest 测试
 │   ├── requirements.txt
 │   └── .env.example
 │
 ├── admin/                      # Vue 3 Admin 管理后台
 │   ├── src/
-│   │   ├── components/         # 可复用组件
 │   │   ├── pages/              # 页面
-│   │   ├── views/              # 视图
-│   │   ├── api/                # API 调用
-│   │   ├── store/              # Pinia 状态管理
+│   │   ├── router/             # 路由
+│   │   ├── stores/             # Pinia 状态管理
 │   │   └── utils/              # 工具函数
 │   └── package.json
+
+├── store-console/              # 门店控制台静态页面
+│   ├── index.html
+│   ├── app.js
+│   └── styles.css
 │
 ├── miniprogram/                # 微信小程序（统一入口）
 │   ├── pages/                  # 主包页面 (5 个)
@@ -100,6 +106,9 @@
 │   ├── HEALTH_CHECK.sh
 │   ├── BACKUP_DATABASE.sh
 │   └── smoke_api.sh
+
+├── .github/workflows/          # CI 流水线
+│   └── ci.yml
 │
 └── .gitignore
 ```
@@ -175,15 +184,7 @@ npm run dev
 
 ## 数据库
 
-PostgreSQL 配置：
-
-```
-host: localhost
-port: 5432
-database: lx_center
-user: postgres
-password: password
-```
+PostgreSQL 配置请以 `backend/.env.example` 为准（支持 `DATABASE_URL` 或 `DB_*`）。
 
 ```bash
 cd backend
@@ -202,6 +203,6 @@ python3 scripts/migrate_slim_to_lx_center.py --dry-run
 python3 scripts/migrate_slim_to_lx_center.py
 ```
 
-## 部署指南
+## 部署与发布
 
-详见 [部署指南](docs/05-部署指南.md)
+当前建议以 `backend/README.md` 的环境配置与启动方式为准，结合 `docs/specs/05-release/README.md` 的发布规范执行。

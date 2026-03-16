@@ -438,6 +438,8 @@ async def store_finance_sync_logs_route(
     eventType: str = "ALL",
     serviceType: str = "ALL",
     limit: int = 200,
+    dateFrom: str = "",
+    dateTo: str = "",
     authorization: str = Header(default=""),
     x_api_token: str = Header(default="", alias="X-Api-Token"),
     db: Session = Depends(get_db),
@@ -456,7 +458,8 @@ async def store_finance_sync_logs_route(
 
     try:
         result = list_finance_sync_logs(
-            db, keyword=keyword, event_type=eventType, service_type=serviceType, limit=limit,
+            db, keyword=keyword, event_type=eventType, service_type=serviceType,
+            limit=limit, date_from=dateFrom, date_to=dateTo,
         )
     except StoreApiError as error:
         return _parse_store_error(error)

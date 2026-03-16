@@ -62,7 +62,7 @@ loadData()
 
 <style scoped>
 .page {
-  padding: 20px;
+  padding: 4px;
 }
 
 .filters {
@@ -74,6 +74,6 @@ loadData()
 .cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(220px, 1fr));
-  gap: 12px;
+  gap: 14px;
 }
 </style>

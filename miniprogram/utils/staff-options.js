@@ -9,7 +9,8 @@ const TECHNICIAN_ACCOUNTS = [
   { id: 'tech_fanxiangyang', name: '范向阳' },
   { id: 'tech_fengguohao', name: '冯国豪' },
   { id: 'tech_yaozunyi', name: '姚遵义' },
-  { id: 'tech_zhangyongzhi', name: '张永志' }
+  { id: 'tech_zhangyongzhi', name: '张永志' },
+  { id: 'tech_zhuangyongbi', name: '庄永陛' }
 ];
 
 const SALES_ACCOUNTS = [

@@ -1,15 +1,17 @@
 .page {
   min-height: 100vh;
   padding: 20rpx;
-  background: #f3f6fb;
+  background: #f8f9fb;
   box-sizing: border-box;
 }
 
 .filter-card {
   background: #fff;
-  border-radius: 12rpx;
+  border: none;
+  border-radius: 20rpx;
   padding: 14rpx;
   margin-bottom: 14rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 
 .date-preset-row {
@@ -21,14 +23,14 @@
 
 .preset-chip {
   font-size: 22rpx;
-  color: #334155;
-  background: #e2e8f0;
-  border-radius: 999rpx;
+  color: #3d4148;
+  background: #f0f1f3;
+  border-radius: 12rpx;
   padding: 4rpx 14rpx;
 }
 
 .preset-chip.active {
-  background: #1f2a44;
+  background: #1a1d21;
   color: #fff;
 }
 
@@ -43,23 +45,23 @@
 .date-box {
   min-width: 200rpx;
   font-size: 24rpx;
-  color: #334155;
-  border: 1rpx solid #d7dfed;
-  border-radius: 10rpx;
+  color: #3d4148;
+  border: 2rpx solid #e8eaed;
+  border-radius: 12rpx;
   padding: 10rpx 14rpx;
   background: #fff;
 }
 
 .date-sep {
   font-size: 22rpx;
-  color: #64748b;
+  color: #9ca3af;
 }
 
 .date-apply-btn {
   margin: 0;
   border: none;
-  border-radius: 999rpx;
-  background: #0f766e;
+  border-radius: 12rpx;
+  background: #1a1d21;
   color: #fff;
   line-height: 1.8;
   padding: 0 20rpx;
@@ -73,15 +75,15 @@
 .result-tab {
   flex: 1;
   text-align: center;
-  background: #e2e8f0;
-  color: #334155;
-  border-radius: 10rpx;
+  background: #f0f1f3;
+  color: #3d4148;
+  border-radius: 12rpx;
   font-size: 24rpx;
   padding: 10rpx 0;
 }
 
 .result-tab.active {
-  background: #1f2a44;
+  background: #1a1d21;
   color: #fff;
 }
 
@@ -94,14 +96,14 @@
 
 .action-tab {
   font-size: 22rpx;
-  color: #334155;
-  background: #edf2f7;
-  border-radius: 999rpx;
+  color: #3d4148;
+  background: #f0f1f3;
+  border-radius: 12rpx;
   padding: 4rpx 12rpx;
 }
 
 .action-tab.active {
-  background: #0f766e;
+  background: #1a1d21;
   color: #fff;
 }
 
@@ -114,16 +116,16 @@
 
 .sales-label {
   font-size: 22rpx;
-  color: #64748b;
+  color: #9ca3af;
   white-space: nowrap;
 }
 
 .sales-picker {
   min-width: 340rpx;
   font-size: 22rpx;
-  color: #334155;
-  border: 1rpx solid #d7dfed;
-  border-radius: 10rpx;
+  color: #3d4148;
+  border: 2rpx solid #e8eaed;
+  border-radius: 12rpx;
   padding: 8rpx 12rpx;
   background: #fff;
 }
@@ -144,9 +146,9 @@
 
 .reset-btn {
   margin: 0;
-  border-radius: 999rpx;
-  background: #e2e8f0;
-  color: #1e293b;
+  border-radius: 12rpx;
+  background: #f0f1f3;
+  color: #1a1d21;
   line-height: 1.8;
   padding: 0 20rpx;
 }
@@ -154,8 +156,8 @@
 .export-btn {
   margin: 0;
   border: none;
-  border-radius: 999rpx;
-  background: #0f766e;
+  border-radius: 12rpx;
+  background: #1a1d21;
   color: #fff;
   line-height: 1.8;
   padding: 0 20rpx;
@@ -171,26 +173,26 @@
 .quick-export-btn {
   margin: 0;
   border: none;
-  border-radius: 999rpx;
+  border-radius: 12rpx;
   line-height: 1.8;
   padding: 0 20rpx;
 }
 
 .quick-export-btn.failed {
-  background: #fee2e2;
-  color: #b83232;
+  background: #fef2f2;
+  color: #dc2626;
 }
 
 .quick-export-btn.skipped {
-  background: #f1f5f9;
-  color: #475569;
+  background: #f0f1f3;
+  color: #6b7280;
 }
 
 .search-input {
   flex: 1;
   min-height: 64rpx;
-  border: 1rpx solid #d7dfed;
-  border-radius: 10rpx;
+  border: 2rpx solid #e8eaed;
+  border-radius: 12rpx;
   padding: 0 16rpx;
   font-size: 24rpx;
 }
@@ -198,8 +200,8 @@
 .search-btn {
   margin: 0;
   border: none;
-  border-radius: 999rpx;
-  background: #1f2a44;
+  border-radius: 12rpx;
+  background: #1a1d21;
   color: #fff;
   line-height: 1.8;
   padding: 0 20rpx;
@@ -207,14 +209,16 @@
 
 .clear-link {
   font-size: 24rpx;
-  color: #2f4f80;
+  color: #1a1d21;
 }
 
 .summary-card {
   background: #fff;
-  border-radius: 12rpx;
+  border: none;
+  border-radius: 20rpx;
   padding: 14rpx;
   margin-bottom: 14rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 
 .summary-grid {
@@ -225,15 +229,16 @@
 
 .summary-item {
   text-align: center;
-  background: #f8fafc;
-  border-radius: 10rpx;
+  background: #f8f9fb;
+  border: 1rpx solid #e8edf6;
+  border-radius: 12rpx;
   padding: 10rpx 8rpx;
 }
 
 .summary-label {
   display: block;
   font-size: 20rpx;
-  color: #64748b;
+  color: #9ca3af;
 }
 
 .summary-value {
@@ -241,19 +246,19 @@
   margin-top: 6rpx;
   font-size: 30rpx;
   font-weight: 700;
-  color: #1e293b;
+  color: #1a1d21;
 }
 
 .summary-value.success {
-  color: #1f7a46;
+  color: #065f46;
 }
 
 .summary-value.failed {
-  color: #b83232;
+  color: #dc2626;
 }
 
 .summary-value.skipped {
-  color: #475569;
+  color: #6b7280;
 }
 
 .summary-reasons {
@@ -272,7 +277,7 @@
 
 .reason-chip {
   font-size: 20rpx;
-  border-radius: 999rpx;
+  border-radius: 12rpx;
   padding: 4rpx 12rpx;
 }
 
@@ -292,13 +297,13 @@
 }
 
 .reason-default {
-  color: #475569;
-  background: #f1f5f9;
+  color: #6b7280;
+  background: #f0f1f3;
 }
 
 .action-chip {
   font-size: 20rpx;
-  border-radius: 999rpx;
+  border-radius: 12rpx;
   padding: 4rpx 12rpx;
 }
 
@@ -308,7 +313,7 @@
 }
 
 .action-batch {
-  color: #0f766e;
+  color: #059669;
   background: #ccfbf1;
 }
 
@@ -318,14 +323,14 @@
 }
 
 .action-default {
-  color: #475569;
-  background: #f1f5f9;
+  color: #6b7280;
+  background: #f0f1f3;
 }
 
 .summary-loading {
   margin-top: 8rpx;
   font-size: 20rpx;
-  color: #64748b;
+  color: #9ca3af;
 }
 
 .state-box {
@@ -333,11 +338,11 @@
   border-radius: 12rpx;
   padding: 40rpx 20rpx;
   text-align: center;
-  color: #7a869c;
+  color: #9ca3af;
 }
 
 .error-box {
-  color: #c53030;
+  color: #dc2626;
 }
 
 .retry-btn {
@@ -352,13 +357,15 @@
 
 .summary-row {
   font-size: 24rpx;
-  color: #64748b;
+  color: #9ca3af;
 }
 
 .audit-card {
   background: #fff;
-  border-radius: 12rpx;
+  border: none;
+  border-radius: 20rpx;
   padding: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 
 .card-head {
@@ -369,28 +376,28 @@
 
 .order-id {
   font-size: 24rpx;
-  color: #334155;
+  color: #3d4148;
 }
 
 .result-tag {
   font-size: 20rpx;
-  border-radius: 999rpx;
+  border-radius: 12rpx;
   padding: 4rpx 12rpx;
 }
 
 .tag-success {
-  background: #d9f2e3;
-  color: #1f7a46;
+  background: #d1fae5;
+  color: #065f46;
 }
 
 .tag-failed {
-  background: #fee2e2;
-  color: #b83232;
+  background: #fef2f2;
+  color: #dc2626;
 }
 
 .tag-skipped {
-  background: #f1f5f9;
-  color: #475569;
+  background: #f0f1f3;
+  color: #6b7280;
 }
 
 .line {
@@ -398,21 +405,21 @@
   display: flex;
   gap: 8rpx;
   font-size: 24rpx;
-  color: #475569;
+  color: #6b7280;
 }
 
 .error-line {
   margin-top: 10rpx;
   font-size: 22rpx;
-  color: #b83232;
+  color: #dc2626;
   background: #fff5f5;
-  border-radius: 8rpx;
+  border-radius: 12rpx;
   padding: 8rpx 10rpx;
 }
 
 .footer-tip {
   text-align: center;
-  color: #7a869c;
+  color: #9ca3af;
   font-size: 22rpx;
   padding: 8rpx 0 16rpx;
 }

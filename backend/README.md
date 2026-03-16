@@ -95,61 +95,53 @@ backend/
 │   │   └── base.py          # SQLAlchemy Base
 │   ├── schemas/
 │   │   └── __init__.py      # Pydantic 数据验证模型
-│   ├── api/                 # API 路由（待实现）
-│   │   ├── accounts.py
+│   ├── api/                 # API 路由
+│   │   ├── auth.py
 │   │   ├── leads.py
 │   │   ├── stats.py
-│   │   └── wecom.py
-│   ├── services/            # 业务逻辑层（待实现）
-│   │   ├── account_service.py
-│   │   ├── lead_service.py
-│   │   ├── allocation_service.py
-│   │   └── stats_service.py
-│   ├── utils/               # 工具函数（待实现）
-│   │   ├── auth.py
-│   │   ├── time.py
-│   │   └── wecom_client.py
-│   └── integrations/        # 第三方集成（待实现）
-│       ├── openclaw.py
-│       └── wecom.py
+│   │   ├── chat.py
+│   │   ├── audit.py
+│   │   └── store.py
+│   ├── services/            # 业务逻辑层
+│   ├── utils/               # 工具函数
+│   ├── integrations/        # 第三方集成
+│   └── tasks/               # 任务骨架
 ├── migrations/              # Alembic 数据库迁移
-├── tests/                   # 单元测试（待实现）
+├── tests/                   # 单元测试
 ├── requirements.txt         # Python 依赖
 ├── -env.example            # 环境变量示例
 ├── docker-compose.yml       # Docker 本地开发环境
 └── README.md               # 本文件
 ```
 
-## 核心功能模块（第一阶段）
+## 核心功能模块（当前状态）
 
 ### 1. 账号管理
 - ✅ 模型定义完成（app/models/__init__.py）
-- ⏳ API 路由待实现（app/api/accounts.py）
-- ⏳ 业务逻辑待实现（app/services/account_service.py）
+- ✅ API 路由可用（app/api/auth.py, app/api/store.py）
+- ✅ 业务逻辑可用（app/services/auth_service.py, app/services/store_service.py）
 
 ### 2. 线索接入与存储
 - ✅ 模型定义完成（app/models/__init__.py）
-- ⏳ API 路由待实现（app/api/leads.py）
-- ⏳ 业务逻辑待实现（app/services/lead_service.py）
+- ✅ API 路由可用（app/api/leads.py）
+- ✅ 业务逻辑可用（app/services/lead_service.py）
 
 ### 3. 分配轮转
 - ✅ 模型定义完成（app/models/__init__.py）
-- ⏳ API 路由待实现（app/api/allocation.py）
-- ⏳ 轮转引擎待实现（app/services/allocation_service.py）
+- ✅ 轮转逻辑可用（app/services/allocation_service.py）
+- ⏳ 持续优化边界场景与监控
 
 ### 4. 时效追踪（SLA）
 - ✅ 模型定义完成（app/models/__init__.py）
-- ⏳ 时效计算待实现（app/services/sla_service.py）
-- ⏳ 定时任务待实现（app/tasks/sla_check.py）
+- ✅ 时效计算与统计链路可用
+- ⏳ 定时任务调度编排持续完善（app/tasks/sla_check.py）
 
 ### 5. 企业微信集成
-- ⏳ 企业微信客户端待实现（app/integrations/wecom.py）
-- ⏳ 推送服务待实现（app/services/wecom_service.py）
-- ⏳ Webhook 接收待实现（app/api/wecom.py）
+- ⏳ 企业微信联调与稳定性优化中
 
 ### 6. 统计报表
-- ⏳ 报表生成待实现（app/services/stats_service.py）
-- ⏳ API 路由待实现（app/api/stats.py）
+- ✅ 统计 API 可用（app/api/stats.py）
+- ⏳ 指标口径与可视化持续优化
 
 ## 开发指南
 

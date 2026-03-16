@@ -1,30 +1,68 @@
 <view class="ops-page">
   <view class="hero">
-    <text class="hero-title">经营中心</text>
-    <text class="hero-subtitle">覆盖贴膜与洗车双链路：下单、派工、绩效、回访。</text>
-    <text class="hero-role">当前角色：{{roleLabel}}</text>
+    <view class="hero-row">
+      <view>
+        <text class="hero-title">经营中心</text>
+        <text class="hero-role">{{roleLabel}}</text>
+      </view>
+      <button class="logout-btn" bindtap="onLogout">退出登录</button>
+    </view>
+  </view>
+
+  <view class="overview-box">
+    <view class="overview-head">
+      <text class="overview-title">总账号经营看板</text>
+      <text class="overview-date">{{statDate}}</text>
+    </view>
+
+    <view wx:if="{{dashboardLoading}}" class="overview-loading">看板数据加载中...</view>
+
+    <view wx:else class="metrics-grid">
+      <view class="metric-card">
+        <text class="metric-label">洗车台次</text>
+        <text class="metric-value">{{dashboard.washSlotCount}}</text>
+      </view>
+      <view class="metric-card">
+        <text class="metric-label">施工台次</text>
+        <text class="metric-value">{{dashboard.constructionSlotCount}}</text>
+      </view>
+      <view class="metric-card">
+        <text class="metric-label">销售金额</text>
+        <text class="metric-value">¥{{dashboard.salesAmount}}</text>
+      </view>
+      <view class="metric-card">
+        <text class="metric-label">线索量</text>
+        <text class="metric-value">{{dashboard.leadCount}}</text>
+      </view>
+      <view class="metric-card">
+        <text class="metric-label">成交率</text>
+        <text class="metric-value">{{dashboard.dealRateText}}</text>
+      </view>
+      <view class="metric-card">
+        <text class="metric-label">均价</text>
+        <text class="metric-value">¥{{dashboard.avgPrice}}</text>
+      </view>
+    </view>
   </view>
 
   <view class="chain-card chain-film">
     <view class="chain-head">
       <text class="chain-title">贴膜链路</text>
-      <text class="chain-tag">FILM</text>
     </view>
-    <text class="chain-subtitle">贴膜下单、派工、提成、回访、销售业绩</text>
-    <button class="chain-btn" bindtap="onOpenRoute" data-route="{{filmChain.route}}">进入贴膜链路  &gt;</button>
+    <text class="chain-subtitle">下单 / 派工 / 绩效</text>
+    <button class="chain-btn" bindtap="onOpenRoute" data-route="{{filmChain.route}}">进入</button>
   </view>
 
   <view class="chain-card chain-wash">
     <view class="chain-head">
       <text class="chain-title">洗车链路</text>
-      <text class="chain-tag">WASH</text>
     </view>
-    <text class="chain-subtitle">整点预约、洗车派工、施工图片、固定提成</text>
-    <button class="chain-btn" bindtap="onOpenRoute" data-route="{{washChain.route}}">进入洗车链路  &gt;</button>
+    <text class="chain-subtitle">预约 / 派工 / 施工</text>
+    <button class="chain-btn" bindtap="onOpenRoute" data-route="{{washChain.route}}">进入</button>
   </view>
 
   <view class="quick-box">
-    <text class="quick-title">常用入口</text>
+    <text class="quick-title">业务看板入口</text>
     <view class="quick-grid">
       <view class="quick-item" wx:for="{{quickEntries}}" wx:key="key" bindtap="onOpenRoute" data-route="{{item.route}}">
         <text class="quick-name">{{item.name}}</text>

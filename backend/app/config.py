@@ -4,6 +4,7 @@ FastAPI 应用配置管理
 
 import os
 from typing import Optional
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
@@ -39,7 +40,7 @@ class Settings(BaseSettings):
     DB_USER: str = os.getenv("DB_USER", "postgres")
     DB_PASSWORD: str = os.getenv("DB_PASSWORD", "password")
     DB_NAME: str = os.getenv("DB_NAME", "lx_center")
-    DATABASE_URL_DIRECT: str = os.getenv("DATABASE_URL", "").strip()
+    DATABASE_URL_DIRECT: str = Field(default="", validation_alias="DATABASE_URL")
     DB_SSL_MODE: str = os.getenv("DB_SSL_MODE", "").strip()
     DB_CONNECT_TIMEOUT: int = int(os.getenv("DB_CONNECT_TIMEOUT", "10"))
 
@@ -76,6 +77,10 @@ class Settings(BaseSettings):
     OPENCLAW_API_URL: str = os.getenv("OPENCLAW_API_URL", "http://localhost:9000")
     OPENCLAW_API_KEY: str = os.getenv("OPENCLAW_API_KEY", "mock-key")
 
+    # 蔚蓝系统对接
+    WEILAN_API_URL: str = os.getenv("WEILAN_API_URL", "")
+    WEILAN_API_TOKEN: str = os.getenv("WEILAN_API_TOKEN", "")
+
     # 时效规则配置（单位：分钟）
     SLA_1M_MINUTES: int = 1
     SLA_3M_MINUTES: int = 3
@@ -93,7 +98,11 @@ class Settings(BaseSettings):
     DOUYIN_WEBHOOK_TOKEN: str = os.getenv("DOUYIN_WEBHOOK_TOKEN", "")
     DOUYIN_DEFAULT_ACCOUNT: str = os.getenv("DOUYIN_DEFAULT_ACCOUNT", "DY-BOP-001")
     DOUYIN_ACCOUNT_MAP: str = os.getenv("DOUYIN_ACCOUNT_MAP", "{}")
-
+    # 微信小程序配置
+    WX_MINI_APPID: str = os.getenv("WX_MINI_APPID", "")
+    WX_MINI_SECRET: str = os.getenv("WX_MINI_SECRET", "")
+    WX_SUBSCRIBE_TEMPLATE_LEAD: str = os.getenv("WX_SUBSCRIBE_TEMPLATE_LEAD", "")
+    WX_SUBSCRIBE_TEMPLATE_FOLLOWUP: str = os.getenv("WX_SUBSCRIBE_TEMPLATE_FOLLOWUP", "")
     def get_douyin_account_map(self) -> dict:
         """抖音 open_id → account_code 映射（从 JSON 字符串解析）"""
         import json

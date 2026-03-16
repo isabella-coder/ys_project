@@ -37,7 +37,6 @@ Page({
     batchResultFailedIds: [],
     batchResultTargetStatus: '',
     loading: false,
-    statusUpdatingId: '',
     errorText: '',
     orders: [],
     stats: {
@@ -239,61 +238,6 @@ Page({
 
   canQuickEdit(order) {
     return canEditOrder(this.data.role, order)
-  },
-
-  async onQuickStatusTap(e) {
-    const id = e.currentTarget.dataset.id
-    const order = (this.data.orders || []).find((item) => item.id === id)
-    if (!order) {
-      return
-    }
-    if (!this.canQuickEdit(order)) {
-      wx.showToast({ title: '当前账号无权限', icon: 'none' })
-      return
-    }
-
-    const options = ['未完工', '已完工', '已取消']
-    wx.showActionSheet({
-      itemList: options,
-      success: async (res) => {
-        const target = options[Number(res.tapIndex)]
-        if (!target || target === order.status) {
-          return
-        }
-
-        this.setData({ statusUpdatingId: order.id })
-        try {
-          await storeApi.updateOrder(order.id, {
-            version: order.version,
-            status: target,
-            remark: order.remark || '',
-          })
-          storeAuditApi.logOrderOperation({
-            target_id: order.id,
-            action: 'quick_status_update',
-            result: 'success',
-            before_status: order.status || '',
-            after_status: target,
-            source: 'order-list',
-          })
-          await this.loadOrders()
-          wx.showToast({ title: '状态已更新', icon: 'success' })
-        } catch (error) {
-          storeAuditApi.logOrderOperation({
-            target_id: order.id,
-            action: 'quick_status_update',
-            result: 'failed',
-            before_status: order.status || '',
-            after_status: target,
-            error_code: String((error && error.code) || ''),
-            error_message: normalizeErrorMessage(error, '更新失败'),
-            source: 'order-list',
-          })
-          wx.showToast({ title: error.message || '更新失败', icon: 'none' })
-        }
-        this.setData({ statusUpdatingId: '' })
-      }
-    })
   },
 
   onBatchStatusTap() {

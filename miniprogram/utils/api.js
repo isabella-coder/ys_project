@@ -52,7 +52,7 @@ function getApiBaseUrl() {
   }
 
   // 开发默认走本地后端；真机联调请通过 api_base_url 覆盖成公网地址
-  return 'http://127.0.0.1:8000/api/v1'
+  return 'http://118.89.184.199/api/v1'
 }
 
 /**
@@ -105,6 +105,14 @@ const leadApi = {
         actor_id: wx.getStorageSync('sales_id'),
         actor_type: 'sales'
       }
+    })
+  },
+
+  // 更新线索信息（标签等）
+  async updateLead(leadId, data) {
+    return request(`/leads/${leadId}`, {
+      method: 'PATCH',
+      data
     })
   }
 }
@@ -159,11 +167,26 @@ const authApi = {
   },
 
   async login(salesId, password) {
+    // 获取微信 login code，用于绑定 openid（订阅消息推送用）
+    let wxCode = ''
+    try {
+      const loginRes = await new Promise((resolve, reject) => {
+        wx.login({
+          success: resolve,
+          fail: reject,
+        })
+      })
+      wxCode = loginRes.code || ''
+    } catch (e) {
+      console.warn('wx.login 获取 code 失败，不影响登录:', e)
+    }
+
     return request('/auth/login', {
       method: 'POST',
       data: {
         sales_id: salesId,
-        password: password
+        password: password,
+        wx_code: wxCode,
       }
     })
   },

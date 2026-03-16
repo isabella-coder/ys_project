@@ -1,10 +1,11 @@
 .top-card {
-  background: linear-gradient(140deg, #0f172a, #1e293b);
-  color: #f8fafc;
+  background: #ffffff;
+  color: #1a1d21;
+  border-left: none;
 }
 
 .top-card .hint {
-  color: #cbd5e1;
+  color: #6b7280;
   margin-bottom: 16rpx;
 }
 
@@ -19,27 +20,27 @@
 }
 
 .stat-item {
-  border: 2rpx solid #e2e8f0;
+  border: none;
   border-radius: 14rpx;
   padding: 14rpx;
-  background: #f8fafc;
+  background: #f8f9fb;
 }
 
 .stat-label {
-  color: #64748b;
+  color: #9ca3af;
   font-size: 24rpx;
 }
 
 .stat-value {
   display: block;
   margin-top: 8rpx;
-  color: #0f172a;
+  color: #1a1d21;
   font-size: 34rpx;
   font-weight: 700;
 }
 
 .stat-value.success {
-  color: #166534;
+  color: #059669;
 }
 
 .stat-value.warning {
@@ -47,27 +48,29 @@
 }
 
 .stat-value.danger {
-  color: #991b1b;
+  color: #dc2626;
 }
 
 .empty-card {
   text-align: center;
-  padding-top: 52rpx;
-  padding-bottom: 52rpx;
+  padding-top: 56rpx;
+  padding-bottom: 56rpx;
 }
 
 .empty-title {
   font-size: 32rpx;
   font-weight: 600;
+  color: #1a1d21;
 }
 
 .empty-subtitle {
   margin-top: 10rpx;
-  color: #64748b;
+  color: #6b7280;
+  font-size: 24rpx;
 }
 
 .conflict-card {
-  border: 2rpx solid #fecaca;
+  border: 1rpx solid #fecaca;
   background: #fff1f2;
 }
 
@@ -98,16 +101,16 @@
 
 .group-title {
   margin-bottom: 10rpx;
-  color: #0f172a;
+  color: #1a1d21;
   font-weight: 600;
 }
 
 .entry-item {
-  border: 2rpx solid #e2e8f0;
+  border: none;
   border-radius: 12rpx;
   padding: 14rpx;
   margin-bottom: 10rpx;
-  background: #f8fafc;
+  background: #f8f9fb;
 }
 
 .entry-item:last-child {
@@ -128,15 +131,15 @@
 
 .entry-tag {
   padding: 2rpx 10rpx;
-  border-radius: 999rpx;
-  background: #e2e8f0;
+  border-radius: 12rpx;
+  background: #f0f1f3;
   color: #1e293b;
   font-size: 20rpx;
 }
 
 .entry-line {
   margin-top: 8rpx;
-  color: #334155;
+  color: #3d4148;
   font-size: 24rpx;
 }
 
@@ -145,8 +148,23 @@
   margin-left: 0;
   line-height: 1.8;
   border: none;
-  border-radius: 999rpx;
-  background: #0f172a;
+  border-radius: 12rpx;
+  background: #1a1d21;
   color: #ffffff;
   padding: 0 18rpx;
+}
+
+@media (max-width: 420px) {
+  .stats-card {
+    grid-template-columns: 1fr;
+  }
+
+  .entry-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mini-btn {
+    width: 100%;
+  }
 }

@@ -29,7 +29,7 @@
   <view class="search-box">
     <input
       class="search-input"
-      placeholder="搜索称呼/车型/车牌/手机号"
+      placeholder="搜索称呼/车型/车牌/手机号/品牌型号"
       value="{{keyword}}"
       bindinput="onSearchInput"
     />
@@ -138,15 +138,7 @@
       <view class="line">{{item.carModel || '-'}} · {{item.plateNumber || '-'}}</view>
       <view class="line">负责人：{{item.salesBrandText || '未填写'}}</view>
       <view class="line">{{item.appointmentDate || '-'}} {{item.appointmentTime || ''}}</view>
-      <view class="order-actions" wx:if="{{item.canQuickEdit}}">
-        <button
-          class="quick-btn"
-          size="mini"
-          data-id="{{item.id}}"
-          loading="{{statusUpdatingId === item.id}}"
-          catchtap="onQuickStatusTap"
-        >快捷改状态</button>
-      </view>
+      <view class="line commission-line">提成：¥{{item.commissionTotal || 0}} · {{item.commissionStatus || '未生成'}}</view>
       <view class="order-foot">
         <text class="service-tag">{{item.serviceType === 'WASH' ? '洗车' : '贴膜'}}</text>
         <text class="price">¥{{item.priceSummary.totalPrice || 0}}</text>

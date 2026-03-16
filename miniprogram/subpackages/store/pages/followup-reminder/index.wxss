@@ -1,10 +1,11 @@
 .top-card {
-  background: linear-gradient(140deg, #0f172a, #1e293b);
-  color: #f8fafc;
+  background: #ffffff;
+  color: #1a1d21;
+  border-left: none;
 }
 
 .top-card .hint {
-  color: #cbd5e1;
+  color: #6b7280;
 }
 
 .stats-card {
@@ -14,14 +15,14 @@
 }
 
 .stat-item {
-  border: 2rpx solid #e2e8f0;
+  border: none;
   border-radius: 14rpx;
   padding: 14rpx;
-  background: #f8fafc;
+  background: #f8f9fb;
 }
 
 .stat-label {
-  color: #64748b;
+  color: #9ca3af;
   font-size: 24rpx;
 }
 
@@ -30,7 +31,7 @@
   margin-top: 8rpx;
   font-size: 34rpx;
   font-weight: 700;
-  color: #0f172a;
+  color: #1a1d21;
 }
 
 .stat-value.due {
@@ -42,7 +43,7 @@
 }
 
 .stat-value.done {
-  color: #166534;
+  color: #059669;
 }
 
 .tabs {
@@ -55,14 +56,14 @@
   flex: 1;
   text-align: center;
   padding: 10rpx 8rpx;
-  border-radius: 10rpx;
-  background: #f1f5f9;
-  color: #334155;
+  border-radius: 12rpx;
+  background: #f0f1f3;
+  color: #3d4148;
   font-size: 24rpx;
 }
 
 .tab-item.active {
-  background: #0f172a;
+  background: #1a1d21;
   color: #ffffff;
 }
 
@@ -75,11 +76,13 @@
 .empty-title {
   font-size: 32rpx;
   font-weight: 600;
+  color: #1a1d21;
 }
 
 .empty-subtitle {
   margin-top: 10rpx;
-  color: #64748b;
+  color: #6b7280;
+  font-size: 24rpx;
 }
 
 .reminder-card {
@@ -94,18 +97,18 @@
 }
 
 .reminder-id {
-  color: #334155;
-  font-size: 26rpx;
+  color: #3d4148;
+  font-size: 28rpx;
 }
 
 .status-pill {
   padding: 4rpx 14rpx;
-  border-radius: 999rpx;
+  border-radius: 12rpx;
   font-size: 22rpx;
 }
 
 .status-pill.status-pending {
-  background: #e2e8f0;
+  background: #f0f1f3;
   color: #1e293b;
 }
 
@@ -115,18 +118,18 @@
 }
 
 .status-pill.status-overdue {
-  background: #fee2e2;
-  color: #991b1b;
+  background: #fef2f2;
+  color: #dc2626;
 }
 
 .status-pill.status-done {
-  background: #dcfce7;
-  color: #166534;
+  background: #d1fae5;
+  color: #059669;
 }
 
 .reminder-line {
   margin-top: 8rpx;
-  color: #1f2937;
+  color: #1a1d21;
 }
 
 .action-row {
@@ -138,18 +141,41 @@
 .mini-btn {
   margin: 0;
   line-height: 1.8;
-  border-radius: 999rpx;
+  border-radius: 12rpx;
   padding: 0 18rpx;
 }
 
 .mini-btn.primary {
   border: none;
-  background: #0f172a;
+  background: #1a1d21;
   color: #ffffff;
 }
 
 .mini-btn.secondary {
-  border: 2rpx solid #d1d5db;
+  border: none;
   background: #ffffff;
-  color: #1f2937;
+  color: #1a1d21;
+}
+
+@media (max-width: 420px) {
+  .stats-card {
+    grid-template-columns: 1fr;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+  }
+
+  .tab-item {
+    flex: none;
+    width: calc(50% - 5rpx);
+  }
+
+  .action-row {
+    flex-direction: column;
+  }
+
+  .mini-btn {
+    width: 100%;
+  }
 }

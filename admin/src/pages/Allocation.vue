@@ -28,12 +28,13 @@
 
 <style scoped>
 .page {
-  padding: 20px;
+  padding: 4px;
 }
 
 .desc {
   margin-bottom: 16px;
-  color: #666;
+  color: #6b7280;
+  font-size: 14px;
 }
 
 .card {
@@ -44,5 +45,6 @@ ul {
   margin: 0;
   padding-left: 18px;
   line-height: 1.8;
+  color: #3d4148;
 }
 </style>

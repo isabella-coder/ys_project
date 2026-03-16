@@ -2,7 +2,9 @@
 线索 API 路由
 """
 
+import json
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.db import get_db
 from app.schemas import LeadCreate, LeadResponse, FirstReplyData, WechatInviteData, WechatStatusUpdate, PaginatedResponse
@@ -146,9 +148,13 @@ async def get_lead_detail(
             "account_code": lead.account_code,
             "store_code": lead.store_code,
             "customer_nickname": lead.customer_nickname,
+            "customer_phone": lead.customer_phone,
+            "customer_wechat": lead.customer_wechat,
             "car_model": lead.car_model,
             "service_type": lead.service_type,
+            "film_brand": lead.film_brand,
             "budget_range": lead.budget_range,
+            "tags": json.loads(lead.tags) if lead.tags else [],
             "assigned_to": lead.assigned_sales_id,
             "assigned_at": lead.assigned_at,
             "status": lead.status,
@@ -161,6 +167,58 @@ async def get_lead_detail(
             "wechat_result_at": lead.wechat_result_at,
             "conversation_summary": lead.conversation_summary,
             "created_at": lead.created_at,
+        }
+    }
+
+
+class LeadUpdateBody(BaseModel):
+    """Lead 编辑请求体"""
+    car_model: str = None
+    service_type: str = None
+    film_brand: str = None
+    budget_range: str = None
+    customer_phone: str = None
+    customer_wechat: str = None
+    tags: list = None
+
+
+@router.patch("/{lead_id}")
+async def update_lead(
+    lead_id: str,
+    body: LeadUpdateBody,
+    authorization: str = Header(default=""),
+    db: Session = Depends(get_db)
+):
+    """更新线索信息（标签、车型、服务类型等）"""
+    if not get_auth_profile_from_header(authorization):
+        return {"code": 401, "message": "登录状态失效，请重新登录"}
+
+    lead = get_lead_by_id(db, lead_id)
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead not found")
+
+    # 只更新提供的字段
+    update_fields = body.dict(exclude_none=True)
+    if "tags" in update_fields:
+        lead.tags = json.dumps(update_fields.pop("tags"), ensure_ascii=False)
+    for field, value in update_fields.items():
+        if hasattr(lead, field):
+            setattr(lead, field, value)
+
+    db.commit()
+    db.refresh(lead)
+
+    return {
+        "code": 0,
+        "data": {
+            "lead_id": lead.lead_id,
+            "tags": json.loads(lead.tags) if lead.tags else [],
+            "car_model": lead.car_model,
+            "service_type": lead.service_type,
+            "film_brand": lead.film_brand,
+            "budget_range": lead.budget_range,
+            "customer_phone": lead.customer_phone,
+            "customer_wechat": lead.customer_wechat,
         }
     }
 

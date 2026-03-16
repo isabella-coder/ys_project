@@ -68,31 +68,34 @@ npm run dev
 ## 文件结构
 
 ```
-养龙虾/
+ys/
 ├── docs/                      # 完整文档
 │   ├── 01-架构设计.md
 │   ├── ARCHITECTURE.md        # 系统架构
 │   ├── DATABASE_SCHEMA.md     # 数据库设计
 │   ├── API_SPEC.md            # API 规范
-│   └── PHASE1_REQUIREMENTS.md # 开发清单
+│   ├── PHASE1_REQUIREMENTS.md # 开发清单
+│   └── specs/                 # 分层规格文档
 │
 ├── backend/                   # FastAPI 后端
 │   ├── app/
 │   │   ├── main.py            # 应用入口
 │   │   ├── models/            # 数据模型
 │   │   ├── schemas/           # 数据验证
-│   │   ├── api/               # API 路由 (待实现)
-│   │   ├── services/          # 业务逻辑 (待实现)
+│   │   ├── api/               # API 路由
+│   │   ├── services/          # 业务逻辑
 │   │   ├── db/                # 数据库相关
-│   │   └── integrations/      # 第三方集成 (待实现)
+│   │   ├── integrations/      # 第三方集成
+│   │   └── tasks/             # 定时任务骨架
+│   ├── migrations/            # Alembic 迁移
+│   ├── tests/                 # Pytest 测试
 │   ├── requirements.txt
 │   ├── docker-compose.yml
 │   └── README.md
 │
 ├── admin/                     # Vue3 Admin前端
 │   ├── src/
-│   │   ├── pages/             # 页面 (部分待实现)
-│   │   ├── components/        # 组件
+│   │   ├── pages/             # 页面
 │   │   ├── router/            # 路由
 │   │   ├── stores/            # 状态管理
 │   │   ├── utils/             # API 封装
@@ -102,14 +105,14 @@ npm run dev
 │   ├── vite.config.js
 │   └── README.md
 │
-├── miniprogram/               # 微信小程序
-│   ├── pages/                 # 页面 (待实现)
+├── miniprogram/               # 微信小程序（主包 + store 子包）
+│   ├── pages/
+│   ├── subpackages/store/
 │   ├── utils/
-│   │   └── api.js             # API 封装
-│   ├── app.json
-│   ├── app.js
-│   ├── app.wxss
 │   └── README.md
+
+├── .github/workflows/         # CI 流程
+│   └── ci.yml
 │
 ├── .gitignore
 └── README.md (本文件)
@@ -126,15 +129,19 @@ npm run dev
 - Vue3 Admin 基础结构
 - 微信小程序基础结构
 - API 调用封装
+- Alembic 迁移骨架
+- CI 基础流程（backend pytest + admin lint/type-check/build）
+- 后端测试目录与基础测试用例
+- 后端任务目录骨架
 
 ### ⏳ 第一阶段（核心闭环）
-- [ ] 账号管理 API 实现
-- [ ] 线索接入和分配 API 实现
-- [ ] 时效追踪（SLA）实现
-- [ ] 企业微信推送实现
-- [ ] Admin 页面实现
-- [ ] 定时任务（SLA检查、日报生成）
-- [ ] 测试和优化
+- [x] 账号管理 API 实现（基础能力）
+- [x] 线索接入和分配 API 实现（核心链路）
+- [x] 时效追踪（SLA）实现（核心字段与统计）
+- [ ] 企业微信推送实现（联调与稳定性完善中）
+- [x] Admin 关键页面可用
+- [ ] 定时任务（SLA 检查、日报生成）与调度编排
+- [ ] 覆盖更多回归测试与质量门禁
 
 ### 🔮 后续阶段
 - 第二阶段：机器人真人化优化、微信状态自动识别、按钮回写

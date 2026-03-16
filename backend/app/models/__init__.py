@@ -58,6 +58,7 @@ class Sales(Base):
     store_code = Column(String(20), ForeignKey("store.store_code"), nullable=False)
     wechat_id = Column(String(100), nullable=True)
     mobile = Column(String(20), nullable=True)
+    wx_openid = Column(String(100), nullable=True, comment="微信小程序 openid，用于订阅消息推送")
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -106,11 +107,15 @@ class Lead(Base):
     # 客户信息
     customer_nickname = Column(String(100), nullable=True)
     customer_contact = Column(String(20), nullable=True)
+    customer_phone = Column(String(20), nullable=True)
+    customer_wechat = Column(String(50), nullable=True)
     
     # 需求信息（机器人识别和提取）
     car_model = Column(String(100), nullable=True)
     service_type = Column(String(50), nullable=True)
+    film_brand = Column(String(100), nullable=True)
     budget_range = Column(String(50), nullable=True)
+    tags = Column(Text, nullable=True)  # JSON array: ["高意向", "已到店"]
     consultation_topic = Column(Text, nullable=True)
     conversation_summary = Column(Text, nullable=True)
     

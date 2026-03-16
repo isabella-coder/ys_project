@@ -23,9 +23,9 @@
 
     <div class="quick-links">
       <h3>快速导航</h3>
-      <el-button type="primary" @click="$router.push('/accounts')">📱 账号管理</el-button>
-      <el-button type="primary" @click="$router.push('/leads')">📋 线索中心</el-button>
-      <el-button type="primary" @click="$router.push('/stats/daily')">📊 日报统计</el-button>
+      <el-button type="primary" @click="$router.push('/accounts')">账号管理</el-button>
+      <el-button type="primary" @click="$router.push('/leads')">线索中心</el-button>
+      <el-button type="primary" @click="$router.push('/stats/daily')">日报统计</el-button>
     </div>
   </div>
 </template>
@@ -62,48 +62,57 @@ onMounted(async () => {
 
 <style scoped>
 .home {
-  padding: 20px;
+  padding: 4px;
 }
 
 h1 {
-  margin-bottom: 30px;
-  color: #333;
+  margin-bottom: 28px;
+  color: #1a1d21;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 40px;
+  gap: 16px;
+  margin-bottom: 32px;
 }
 
 .stat-card {
-  background: white;
+  background: #ffffff;
   padding: 20px;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
 }
 
 .stat-label {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 10px;
+  font-size: 13px;
+  color: #9ca3af;
+  margin-bottom: 8px;
+  font-weight: 500;
 }
 
 .stat-value {
-  font-size: 32px;
-  font-weight: bold;
-  color: #409eff;
+  font-size: 28px;
+  font-weight: 600;
+  color: #1a1d21;
 }
 
 .quick-links {
-  background: white;
+  background: #ffffff;
   padding: 20px;
-  border-radius: 4px;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
 }
 
 .quick-links h3 {
-  margin-bottom: 15px;
+  margin-bottom: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1d21;
 }
 
 .quick-links button {

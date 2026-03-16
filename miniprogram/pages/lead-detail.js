@@ -5,6 +5,9 @@ Page({
     lead: null,
     loading: true,
     actionLoading: false,
+    editingTags: false,
+    newTagText: '',
+    presetTags: ['高意向', '低意向', '已到店', '已报价', '需跟进', '价格敏感', '全车', '前挡', '车衣', '改色'],
     wechatMethods: [
       { key: 'customer_sent', label: '客户发微信号' },
       { key: 'sales_sent', label: '我发微信号' },
@@ -175,5 +178,59 @@ Page({
     const d = new Date(str)
     const pad = n => String(n).padStart(2, '0')
     return `${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+  },
+
+  // ─── 标签编辑 ───
+  toggleTagEdit() {
+    if (this.data.editingTags) {
+      // 点「完成」→ 保存
+      this.saveTags()
+    }
+    this.setData({ editingTags: !this.data.editingTags, newTagText: '' })
+  },
+
+  togglePresetTag(e) {
+    const tag = e.currentTarget.dataset.tag
+    const lead = this.data.lead
+    let tags = lead.tags ? [...lead.tags] : []
+    const idx = tags.indexOf(tag)
+    if (idx >= 0) {
+      tags.splice(idx, 1)
+    } else {
+      tags.push(tag)
+    }
+    this.setData({ 'lead.tags': tags })
+  },
+
+  removeTag(e) {
+    const idx = e.currentTarget.dataset.index
+    const tags = [...(this.data.lead.tags || [])]
+    tags.splice(idx, 1)
+    this.setData({ 'lead.tags': tags })
+  },
+
+  onTagInput(e) {
+    this.setData({ newTagText: e.detail.value })
+  },
+
+  addCustomTag() {
+    const text = (this.data.newTagText || '').trim()
+    if (!text) return
+    const tags = [...(this.data.lead.tags || [])]
+    if (tags.indexOf(text) >= 0) {
+      wx.showToast({ title: '标签已存在', icon: 'none' })
+      return
+    }
+    tags.push(text)
+    this.setData({ 'lead.tags': tags, newTagText: '' })
+  },
+
+  async saveTags() {
+    try {
+      await leadApi.updateLead(this.leadId, { tags: this.data.lead.tags || [] })
+      wx.showToast({ title: '标签已保存', icon: 'success' })
+    } catch (e) {
+      wx.showToast({ title: '保存失败', icon: 'none' })
+    }
   }
 })

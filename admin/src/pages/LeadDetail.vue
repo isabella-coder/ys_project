@@ -41,11 +41,12 @@ onMounted(async () => {
 
 <style scoped>
 .page {
-  padding: 20px;
+  padding: 4px;
 }
 
 .desc {
   margin-bottom: 16px;
-  color: #666;
+  color: #6b7280;
+  font-size: 14px;
 }
 </style>

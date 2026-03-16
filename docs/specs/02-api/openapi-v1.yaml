@@ -494,8 +494,13 @@ components:
       description: |
         `version` is required. Patchable fields are currently controlled server-side
         (`status`, `salesBrandText`, `store`, `appointmentDate`, `appointmentTime`,
-        `dispatchInfo`, `remark`, `deliveryStatus`, `deliveryPassedAt`,
-        `commissionStatus`, `commissionTotal`, `followupRecords`, `followupLastUpdatedAt`).
+        `technicianName`, `dispatchInfo`, `remark`, `workPartRecords`,
+        `constructionPhotos`, `finalPaymentPhotos`, `finalPaymentUploadedAt`,
+        `deliveryStatus`, `deliveryPassedAt`, `commissionStatus`,
+        `commissionGeneratedAt`, `commissionTotal`, `commissionRecords`,
+        `financeSyncStatus`, `financeSyncAt`, `financeSyncMessage`,
+        `financeExternalId`, `financeLastEvent`, `followupRecords`,
+        `followupLastUpdatedAt`).
 
     OrderPatchSuccessResponse:
       type: object

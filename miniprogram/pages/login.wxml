@@ -1,15 +1,19 @@
 <view class="login-page">
   <view class="login-card">
+    <view class="brand-header">
+      <view class="brand-logo">B</view>
+      <text class="brand-name">BOP 保镖</text>
+    </view>
     <view class="title-wrap">
-      <text class="title">销售登录</text>
-      <text class="subtitle">两店客资中台</text>
+      <text class="title">经营账号登录</text>
+      <text class="subtitle">支持店长 / 销售 / 财务 / 施工</text>
     </view>
 
     <view class="form-item">
       <text class="label">账号</text>
-      <picker mode="selector" range="{{salesOptions}}" range-key="sales_name" value="{{selectedIndex}}" bindchange="onSalesChange">
+      <picker mode="selector" range="{{accountOptions}}" range-key="display_name" value="{{selectedIndex}}" bindchange="onAccountChange">
         <view class="picker-box">
-          <text class="{{selectedSalesId ? '' : 'placeholder'}}">{{selectedLabel || '请选择账号'}}</text>
+          <text class="{{selectedAccountId ? '' : 'placeholder'}}">{{selectedLabel || '请选择账号'}}</text>
         </view>
       </picker>
     </view>

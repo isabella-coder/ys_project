@@ -5,10 +5,10 @@ const STORE_API_TOKEN_STORAGE_KEY = 'store_internal_api_token';
 
 const ENV_BASE_URL = {
   // 微信开发者工具本机联调。
-  develop: 'http://127.0.0.1:8000',
+  develop: 'http://118.89.184.199',
   // 体验版/正式版请写入公网 HTTPS 域名（可通过 setFinanceBaseUrl 设置）。
-  trial: 'https://a3f1be6049a27d.lhr.life',
-  release: 'https://a3f1be6049a27d.lhr.life'
+  trial: 'http://118.89.184.199',
+  release: 'http://118.89.184.199'
 };
 
 const financeConfig = {

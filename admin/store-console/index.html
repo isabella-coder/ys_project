@@ -31,10 +31,8 @@
         </form>
         <p class="error-text" id="loginError"></p>
         <div class="hint-card">
-          <div>默认测试账号：</div>
-          <div>`manager_wujiabin / 0000`（店长）</div>
-          <div>`sales_mengao / 0000`（销售）</div>
-          <div>`tech_wangao / 0000`（施工）</div>
+          <div>账号：manager_yushuai</div>
+          <div>密码：0000</div>
         </div>
       </section>
 
@@ -179,6 +177,14 @@
         <section id="financeTab" class="tab-panel hidden">
           <div class="filters">
             <label>
+              开始日期
+              <input id="financeDateFrom" type="date" />
+            </label>
+            <label>
+              截止日期
+              <input id="financeDateTo" type="date" />
+            </label>
+            <label>
               事件类型
               <select id="financeEventTypeSelect">
                 <option value="ALL">全部</option>
@@ -211,6 +217,7 @@
               </select>
             </label>
             <button id="financeRefreshBtn" class="btn btn-primary">刷新财务日志</button>
+            <button id="financeExportBtn" class="btn">导出 CSV</button>
           </div>
 
           <div class="cards" id="financeStats"></div>
@@ -228,6 +235,7 @@
                   <th>金额</th>
                   <th>财务单号</th>
                   <th>结果</th>
+                  <th>操作</th>
                 </tr>
               </thead>
               <tbody id="financeTbody"></tbody>
@@ -275,6 +283,16 @@
           </div>
         </section>
       </section>
+    </div>
+
+    <div id="orderDetailModal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>订单详情</h3>
+          <button id="modalCloseBtn" class="modal-close-btn">&times;</button>
+        </div>
+        <div id="orderDetailBody" class="modal-body"></div>
+      </div>
     </div>
 
     <script src="./app.js"></script>

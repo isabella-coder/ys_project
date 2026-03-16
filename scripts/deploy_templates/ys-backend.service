@@ -1,0 +1,15 @@
+[Unit]
+Description=YS FastAPI Backend
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/ys-backend/backend
+EnvironmentFile=/opt/ys-backend/backend/.env
+ExecStart=/opt/ys-backend/.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+Restart=always
+RestartSec=3
+User=root
+
+[Install]
+WantedBy=multi-user.target

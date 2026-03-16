@@ -164,11 +164,13 @@ def verify_password(password: str, stored_secret: str) -> bool:
 
 
 def build_user_profile(user: StoreUser) -> dict:
+    role = normalize_role(user.role)
     return {
         "username": normalize_text(user.username),
         "name": normalize_text(user.name),
-        "role": normalize_role(user.role),
+        "role": role,
         "store": normalize_store_code(user.store_code),
+        "permissions": _get_permissions(role),
     }
 
 
@@ -547,12 +549,27 @@ def update_store_order(db: Session, order_id: str, body: dict) -> dict:
         "store",
         "appointmentDate",
         "appointmentTime",
+        "technicianName",
         "dispatchInfo",
         "remark",
+        "workPartRecords",
+        "constructionPhotos",
+        "boxCodePhoto",
+        "rollNumberPhoto",
+        "cuttingFee",
+        "finalPaymentPhotos",
+        "finalPaymentUploadedAt",
         "deliveryStatus",
         "deliveryPassedAt",
         "commissionStatus",
+        "commissionGeneratedAt",
         "commissionTotal",
+        "commissionRecords",
+        "financeSyncStatus",
+        "financeSyncAt",
+        "financeSyncMessage",
+        "financeExternalId",
+        "financeLastEvent",
         "followupRecords",
         "followupLastUpdatedAt",
     }
@@ -1067,10 +1084,23 @@ def mark_followup_done(db: Session, user: dict, order_id: str, type_key: str, re
 def list_finance_sync_logs(
     db: Session, keyword: str = "", event_type: str = "ALL",
     service_type: str = "ALL", limit: int = 200,
+    date_from: str = "", date_to: str = "",
 ) -> dict:
     """财务同步日志列表"""
     from app.models import FinanceSyncLog
     query = db.query(FinanceSyncLog).order_by(FinanceSyncLog.created_at.desc())
+    if date_from:
+        try:
+            dt_from = datetime.strptime(date_from, "%Y-%m-%d")
+            query = query.filter(FinanceSyncLog.created_at >= dt_from)
+        except ValueError:
+            pass
+    if date_to:
+        try:
+            dt_to = datetime.strptime(date_to, "%Y-%m-%d") + timedelta(days=1)
+            query = query.filter(FinanceSyncLog.created_at < dt_to)
+        except ValueError:
+            pass
     rows = query.limit(min(limit, 1000)).all()
 
     items = []

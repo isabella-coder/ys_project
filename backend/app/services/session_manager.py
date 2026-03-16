@@ -30,9 +30,10 @@ class ChatSession:
     created_at: float = field(default_factory=time.time)
     updated_at: float = field(default_factory=time.time)
 
-    # 提取到的客户信息字段
-    REQUIRED_FIELDS = {"customer_nickname", "car_model", "service_type"}
-    OPTIONAL_FIELDS = {"budget_range", "customer_phone", "customer_wechat"}
+    # 必须收集到项目+车型+联系方式才建线索
+    REQUIRED_FIELDS = {"car_model", "service_type"}
+    CONTACT_FIELDS = {"customer_phone", "customer_wechat"}
+    OPTIONAL_FIELDS = {"budget_range", "customer_nickname", "is_new_car"}
 
     def add_message(self, role: str, content: str):
         self.messages.append(ChatMessage(role=role, content=content))
@@ -51,8 +52,10 @@ class ChatSession:
         self.updated_at = time.time()
 
     def is_info_sufficient(self) -> bool:
-        """判断是否收集到了最低必要信息"""
-        return all(self.extracted_info.get(f) for f in self.REQUIRED_FIELDS)
+        """判断是否收集到了最低必要信息：项目+车型+至少一种联系方式"""
+        has_required = all(self.extracted_info.get(f) for f in self.REQUIRED_FIELDS)
+        has_contact = any(self.extracted_info.get(f) for f in self.CONTACT_FIELDS)
+        return has_required and has_contact
 
     def is_expired(self, ttl_seconds: int = 3600) -> bool:
         """会话是否过期（默认 1 小时无活动）"""

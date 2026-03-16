@@ -28,16 +28,22 @@
   <!-- 线索列表 -->
   <view class="lead-list">
     <view wx:if="{{loading && leads.length === 0}}" class="loading-box">
-      <text>加载中...</text>
+      <view class="skeleton-card" wx:for="{{[1,2,3]}}" wx:key="index">
+        <view class="skeleton skeleton-line skeleton-line-medium"></view>
+        <view class="skeleton skeleton-line skeleton-line-short"></view>
+        <view class="skeleton skeleton-line skeleton-line-full" style="height:20rpx"></view>
+      </view>
     </view>
 
     <view wx:elif="{{leads.length === 0}}" class="empty-box">
-      <text class="empty-icon">📭</text>
+      <view class="empty-icon-wrap">
+        <view class="empty-mailbox"></view>
+      </view>
       <text class="empty-text">暂无线索</text>
     </view>
 
     <view wx:else>
-      <view class="lead-card" wx:for="{{leads}}" wx:key="lead_id"
+      <view class="lead-card status-{{item.status}}" wx:for="{{leads}}" wx:key="lead_id"
         bindtap="goToDetail" data-id="{{item.lead_id}}">
         
         <!-- 卡片头部 -->

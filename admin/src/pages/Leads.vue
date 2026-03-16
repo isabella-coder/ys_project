@@ -1,7 +1,7 @@
 <template>
   <div class="leads-page">
     <div class="header">
-      <h2>📋 线索中心</h2>
+      <h2>线索中心</h2>
       <div class="filters">
         <el-select v-model="filters.store_code" placeholder="选择门店" clearable>
           <el-option label="BOP店" value="BOP" />
@@ -334,7 +334,7 @@ const formatTime = (time) => {
 
 <style scoped>
 .leads-page {
-  padding: 20px;
+  padding: 4px;
 }
 
 .header {
@@ -342,7 +342,10 @@ const formatTime = (time) => {
 }
 
 .header h2 {
-  margin-bottom: 15px;
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1d21;
 }
 
 .filters {
@@ -358,65 +361,71 @@ const formatTime = (time) => {
 .stats-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
+  gap: 14px;
   margin-bottom: 20px;
 }
 
 .stat-card {
-  background: white;
-  padding: 15px;
-  border-radius: 4px;
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: none;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
 }
 
 .stat-card .label {
-  color: #666;
-  font-size: 14px;
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .stat-card .value {
-  font-size: 24px;
-  font-weight: bold;
-  color: #409eff;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1a1d21;
 }
 
 .table-container {
-  background: white;
+  background: #ffffff;
   padding: 20px;
-  border-radius: 4px;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
 }
 
 .detail-content {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 14px;
 }
 
 .detail-item {
   display: flex;
-  gap: 15px;
+  gap: 14px;
   align-items: flex-start;
 }
 
 .detail-item .label {
-  font-weight: bold;
-  color: #333;
+  font-weight: 600;
+  color: #1a1d21;
   min-width: 100px;
+  font-size: 13px;
 }
 
 .detail-item .value {
-  color: #666;
+  color: #6b7280;
+  font-size: 14px;
 }
 
 .summary {
-  background: #f5f5f5;
-  padding: 10px;
-  border-radius: 4px;
-  color: #666;
+  background: #f8f9fb;
+  padding: 12px;
+  border-radius: 8px;
+  color: #6b7280;
   line-height: 1.6;
+  font-size: 13px;
 }
 
 .actions {

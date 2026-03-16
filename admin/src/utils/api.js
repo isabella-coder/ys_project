@@ -3,6 +3,7 @@
  */
 
 import axios from 'axios'
+import { useAppStore } from '../stores/app'
 
 const api = axios.create({
   baseURL: '/api',
@@ -12,7 +13,20 @@ const api = axios.create({
 // 请求拦截器
 api.interceptors.request.use(
   config => {
-    // TODO: 添加 Authorization header
+    let token = ''
+    try {
+      const appStore = useAppStore()
+      token = appStore.token || localStorage.getItem('token') || ''
+    } catch {
+      token = localStorage.getItem('token') || ''
+    }
+
+    if (token) {
+      config.headers = config.headers || {}
+      config.headers.Authorization = `Bearer ${token}`
+      config.headers['X-Api-Token'] = token
+    }
+
     return config
   },
   error => Promise.reject(error)
